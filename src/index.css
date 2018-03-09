@@ -270,3 +270,7 @@ input:focus {
   background-color: #ebebeb;
   display: inline-block;
 }
+
+.editor {
+  background: #fff;
+}

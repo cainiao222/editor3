@@ -6,7 +6,7 @@ const { State } = require('markup-it');
 const markdown = require('markup-it/lib/markdown');
 
 const state = State.create(markdown);
-const document = state.deserializeToDocument('Hello *World*  **WORLD** _FOLD_ `block`\n');
+const document = state.deserializeToDocument('Hello *World*  **WORLD** _FOLD_ `block`\n## Header\n');
 
 
 
@@ -16,51 +16,195 @@ const DEFAULT_NODE = 'paragraph'
 
 class SeafileEditor extends React.Component {
 
-    state = {
-        value: initialValue,
+  state = {
+    value: initialValue,
+  }
+
+  /**
+   * Check if the current selection has a mark with `type` in it.
+   *
+   * @param {String} type
+   * @return {Boolean}
+   */
+
+   hasMark = type => {
+     const { value } = this.state
+     return value.activeMarks.some(mark => mark.type == type)
+   }
+
+  /**
+   * Check if the any of the currently selected blocks are of `type`.
+   *
+   * @param {String} type
+   * @return {Boolean}
+   */
+
+  hasBlock = type => {
+    const { value } = this.state
+    return value.blocks.some(node => node.type == type)
+  }
+
+  onChange = ({ value }) => {
+    this.setState({ value })
+  }
+
+
+  /**
+  * Get the block type for a series of auto-markdown shortcut `chars`.
+  *
+  * @param {String} chars
+  * @return {String} block
+  */
+  getType = chars => {
+    switch (chars) {
+      case '*':
+      case '-':
+      case '+':
+      return 'list-item'
+      case '>':
+      return 'block-quote'
+      case '#':
+      return 'header_one'
+      case '##':
+      return 'header_two'
+      case '###':
+      return 'header_three'
+      case '####':
+      return 'header_four'
+      case '#####':
+      return 'header_five'
+      case '######':
+      return 'header_six'
+      default:
+      return null
+    }
+  }
+
+  /**
+  * On key down, check for our specific key shortcuts.
+  *
+  * @param {Event} event
+  * @param {Change} change
+  */
+  onKeyDown = (event, change) => {
+    switch (event.key) {
+      case ' ':
+        return this.onSpace(event, change)
+      case 'Backspace':
+        return this.onBackspace(event, change)
+      case 'Enter':
+        return this.onEnter(event, change)
+    }
+  }
+
+  /**
+  * On space, if it was after an auto-markdown shortcut, convert the current
+  * node into the shortcut's corresponding type.
+  *
+  * @param {Event} event
+  * @param {Change} change
+  */
+
+  onSpace = (event, change) => {
+    const { value } = change
+    if (value.isExpanded) return
+
+    const { startBlock, startOffset } = value
+    const chars = startBlock.text.slice(0, startOffset).replace(/\s*/g, '')
+    const type = this.getType(chars)
+
+    if (!type) return
+    if (type == 'list-item' && startBlock.type == 'list-item') return
+    event.preventDefault()
+
+    change.setBlocks(type)
+
+    if (type == 'list-item') {
+      change.wrapBlock('bulleted-list')
     }
 
-    /**
-     * Check if the current selection has a mark with `type` in it.
-     *
-     * @param {String} type
-     * @return {Boolean}
-     */
+    change.extendToStartOf(startBlock).delete()
+    return true
+  }
 
-    hasMark = type => {
-        const { value } = this.state
-        return value.activeMarks.some(mark => mark.type == type)
+  /**
+  * On backspace, if at the start of a non-paragraph, convert it back into a
+  * paragraph node.
+  *
+  * @param {Event} event
+  * @param {Change} change
+  */
+
+  onBackspace = (event, change) => {
+    const { value } = change
+    if (value.isExpanded) return
+    if (value.startOffset != 0) return
+
+    const { startBlock } = value
+    if (startBlock.type == 'paragraph') return
+
+    event.preventDefault()
+    change.setBlocks('paragraph')
+
+    const { document } = value
+    if (startBlock.type == 'list-item') {
+      const pNode = document.getParent(startBlock.key)
+      // unwrap the parent 'numbered-list' or 'bulleted-list'
+      change.unwrapBlock(pNode.type)
     }
 
-    /**
-     * Check if the any of the currently selected blocks are of `type`.
-     *
-     * @param {String} type
-     * @return {Boolean}
-     */
+    return true
+  }
 
-    hasBlock = type => {
-        const { value } = this.state
-        return value.blocks.some(node => node.type == type)
-    }
-     
-    onChange = ({ value }) => {
-        this.setState({ value })
+  /**
+  * On return, if at the end of a node type that should not be extended,
+  * create a new paragraph below it.
+  *
+  * @param {Event} event
+  * @param {Change} change
+  */
+
+  onEnter = (event, change) => {
+    const { value } = change
+    if (value.isExpanded) return
+
+    const { startBlock, startOffset, endOffset } = value
+    if (startOffset == 0 && startBlock.text.length == 0)
+      return this.onBackspace(event, change)
+    if (endOffset != startBlock.text.length) return
+
+    if (
+      startBlock.type != 'header_one' &&
+      startBlock.type != 'header_two' &&
+      startBlock.type != 'header_three' &&
+      startBlock.type != 'header_four' &&
+      startBlock.type != 'header_five' &&
+      startBlock.type != 'header_six' &&
+      startBlock.type != 'block-quote'
+    ) {
+      return
     }
 
-    /**
-     * When a mark button is clicked, toggle the current mark.
-     *
-     * @param {Event} event
-     * @param {String} type
-    */
+    event.preventDefault()
+    change.splitBlock().setBlocks('paragraph')
+    return true
+  }
 
-    onClickMark = (event, type) => {
-        event.preventDefault()
-        const { value } = this.state
-        const change = value.change().toggleMark(type)
-        this.onChange(change)
-    }
+
+
+  /**
+  * When a mark button is clicked, toggle the current mark.
+  *
+  * @param {Event} event
+  * @param {String} type
+  */
+
+  onClickMark = (event, type) => {
+    event.preventDefault()
+    const { value } = this.state
+    const change = value.change().toggleMark(type)
+    this.onChange(change)
+  }
 
     /**
      * When a block button is clicked, toggle the block type.
@@ -68,7 +212,6 @@ class SeafileEditor extends React.Component {
      * @param {Event} event
      * @param {String} type
      */
-
     onClickBlock = (event, type) => {
         event.preventDefault()
         const { value } = this.state
@@ -131,9 +274,9 @@ class SeafileEditor extends React.Component {
             return <blockquote {...attributes}>{children}</blockquote>
         case 'bulleted-list':
             return <ul {...attributes}>{children}</ul>
-        case 'heading-one':
+        case 'header_one':
             return <h1 {...attributes}>{children}</h1>
-        case 'heading-two':
+        case 'header_two':
             return <h2 {...attributes}>{children}</h2>
         case 'list-item':
             return <li {...attributes}>{children}</li>
@@ -142,136 +285,132 @@ class SeafileEditor extends React.Component {
         }
     }
 
-    renderMark = props => {
-        const { children, mark } = props
-        switch (mark.type) {
-        case 'BOLD':
-            return <strong>{children}</strong>
-        case 'CODE':
-            return <code>{children}</code>
-        case 'ITALIC':
-            return <em>{children}</em>
-        case 'UNDERLINED':
-            return <u>{children}</u>
-        case 'TITLE': {
-            return (
-                <span
-                  style={{
-                    fontWeight: 'bold',
-                    fontSize: '20px',
-                    margin: '20px 0 10px 0',
-                    display: 'inline-block',
-                  }}
-                >
-                {children}
-                </span>
-            )
-          }
-        case 'punctuation': {
-            return <span style={{ opacity: 0.2 }}>{children}</span>
-          }
-        case 'list': {
-            return (
-                <span
-                  style={{
-                    paddingLeft: '10px',
-                    lineHeight: '10px',
-                    fontSize: '20px',
-                  }}
-                 >
-                 {children}
-                 </span>
-             )
-           }
-         case 'hr': {
-             return (
-                 <span
-                   style={{
-                     borderBottom: '2px solid #000',
-                     display: 'block',
-                     opacity: 0.2,
-                   }}
-                 >
-                 {children}
-                 </span>
-             )
-           }
-       }
-    }
-
-    render() {
+  renderMark = props => {
+    const { children, mark } = props
+    switch (mark.type) {
+      case 'BOLD':
+      return <strong>{children}</strong>
+      case 'CODE':
+      return <code>{children}</code>
+      case 'ITALIC':
+      return <em>{children}</em>
+      case 'UNDERLINED':
+      return <u>{children}</u>
+      case 'TITLE': {
         return (
-            <div>
-                <div className="topbar">
-                    <div>SeafileEditor</div>
-                    {this.renderToolbar()}
-                </div>
-                <div>
-                    <div className="leftNav">
-                        <div className="leftNavTabHeader" />
-                        <div className="leftNavContent" />
-                    </div>
-                    <div className="editor">
-                        <Editor
-                            value={this.state.value}
-                            onChange={this.onChange}
-                            onKeyDown={this.onKeyDown}
-                            renderNode={this.renderNode}
-                            renderMark={this.renderMark}
-                        />
-                    </div>
-                </div>
-            </div>
+          <span
+          style={{
+            fontWeight: 'bold',
+            fontSize: '20px',
+            margin: '20px 0 10px 0',
+            display: 'inline-block',
+          }}
+          >
+          {children}
+          </span>
         )
-    }
-
-    renderToolbar = () => {
+      }
+      case 'punctuation': {
+        return <span style={{ opacity: 0.2 }}>{children}</span>
+      }
+      case 'list': {
         return (
-            <div className="menu toolbar-menu">
-            {this.renderMarkButton('BOLD', 'format_bold')}
-            {this.renderMarkButton('ITALIC', 'format_italic')}
-            {this.renderMarkButton('UNDERLINED', 'format_underlined')}
-            {this.renderMarkButton('CODE', 'code')}
-            {this.renderBlockButton('heading-one', 'looks_one')}
-            {this.renderBlockButton('heading-two', 'looks_two')}
-            {this.renderBlockButton('block-quote', 'format_quote')}
-            {this.renderBlockButton('numbered-list', 'format_list_numbered')}
-            {this.renderBlockButton('bulleted-list', 'format_list_bulleted')}
-            </div>
+          <span
+          style={{
+            paddingLeft: '10px',
+            lineHeight: '10px',
+            fontSize: '20px',
+          }}
+          >
+          {children}
+          </span>
         )
-    }
-
-
-    renderMarkButton = (type, icon) => {
-        const isActive = this.hasMark(type)
-        const onMouseDown = event => this.onClickMark(event, type)
+      }
+      case 'hr': {
         return (
-            // eslint-disable-next-line react/jsx-no-bind
-            <span className="button" onMouseDown={onMouseDown} data-active={isActive}>
-                <span className="material-icons">{icon}</span>
-            </span>
+          <span
+          style={{
+            borderBottom: '2px solid #000',
+            display: 'block',
+            opacity: 0.2,
+          }}
+          >
+          {children}
+          </span>
         )
+      }
     }
+  }
+
+  render() {
+    return (
+      <div>
+        <div className="topbar ">
+          <div>SeafileEditor</div>
+          {this.renderToolbar()}
+          </div>
+        <div>
+          <div className="editor gitbook-markdown-body">
+            <Editor
+              value={this.state.value}
+              onChange={this.onChange}
+              onKeyDown={this.onKeyDown}
+              renderNode={this.renderNode}
+              renderMark={this.renderMark}
+            />
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  renderToolbar = () => {
+    return (
+      <div className="menu toolbar-menu">
+      {this.renderMarkButton('BOLD', 'format_bold')}
+      {this.renderMarkButton('ITALIC', 'format_italic')}
+      {this.renderMarkButton('UNDERLINED', 'format_underlined')}
+      {this.renderMarkButton('CODE', 'code')}
+      {this.renderBlockButton('header_one', 'looks_one')}
+      {this.renderBlockButton('header_two', 'looks_two')}
+      {this.renderBlockButton('block-quote', 'format_quote')}
+      {this.renderBlockButton('numbered-list', 'format_list_numbered')}
+      {this.renderBlockButton('bulleted-list', 'format_list_bulleted')}
+      </div>
+    )
+  }
 
 
-    /**
-     * Render a block-toggling toolbar button.
-     *
-     * @param {String} type
-     * @param {String} icon
-     * @return {Element}
-     */
-    renderBlockButton = (type, icon) => {
-        const isActive = this.hasBlock(type)
-        const onMouseDown = event => this.onClickBlock(event, type)
+  renderMarkButton = (type, icon) => {
+    const isActive = this.hasMark(type)
+    const onMouseDown = event => this.onClickMark(event, type)
+    return (
+      // eslint-disable-next-line react/jsx-no-bind
+      <span className="button" onMouseDown={onMouseDown} data-active={isActive}>
+        <span className="material-icons">{icon}</span>
+      </span>
+    )
+  }
 
-        return (
-            // eslint-disable-next-line react/jsx-no-bind
-            <span className="button" onMouseDown={onMouseDown} data-active={isActive}>
-                <span className="material-icons">{icon}</span>
-            </span>
-        )
-    }
+
+  /**
+  * Render a block-toggling toolbar button.
+  *
+  * @param {String} type
+  * @param {String} icon
+  * @return {Element}
+  */
+  renderBlockButton = (type, icon) => {
+    const isActive = this.hasBlock(type)
+    const onMouseDown = event => this.onClickBlock(event, type)
+
+    return (
+      // eslint-disable-next-line react/jsx-no-bind
+      <span className="button" onMouseDown={onMouseDown} data-active={isActive}>
+        <span className="material-icons">{icon}</span>
+      </span>
+    )
+  }
 };
 
 export { SeafileEditor };

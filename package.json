@@ -3,6 +3,8 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "bootstrap": "^4.0.0",
+    "gitbook-markdown-css": "^1.1.0",
     "immutable": "^3.8.2",
     "markup-it": "^6.0.0",
     "react": "^16.2.0",
