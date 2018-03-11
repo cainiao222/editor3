@@ -6,8 +6,7 @@ const { State } = require('markup-it');
 const markdown = require('markup-it/lib/markdown');
 
 const state = State.create(markdown);
-const document = state.deserializeToDocument('Hello *World*  **WORLD** _FOLD_ `block`\n## Header\n');
-
+const document = state.deserializeToDocument('Hello *World*  **WORLD** _FOLD_ `block`\n## Header\n![fdf](https://download.seafile.top/media/img/seafile-logo.png)\n## header3');
 
 
 const initialValue = Value.create({document: document})
@@ -206,84 +205,99 @@ class SeafileEditor extends React.Component {
     this.onChange(change)
   }
 
+  /**
+   * When a block button is clicked, toggle the block type.
+   *
+   * @param {Event} event
+   * @param {String} type
+   */
+  onClickBlock = (event, type) => {
+    event.preventDefault()
+    const { value } = this.state
+    const change = value.change()
+    const { document } = value
+
+    // Handle everything but list buttons.
+    if (type != 'bulleted-list' && type != 'numbered-list') {
+      const isActive = this.hasBlock(type)
+      const isList = this.hasBlock('list-item')
+
+      if (isList) {
+        change
+        .setBlocks(isActive ? DEFAULT_NODE : type)
+        .unwrapBlock('bulleted-list')
+        .unwrapBlock('numbered-list')
+      } else {
+        change.setBlocks(isActive ? DEFAULT_NODE : type)
+      }
+    } else {
+      // Handle the extra wrapping required for list buttons.
+      const isList = this.hasBlock('list-item')
+      const isType = value.blocks.some(block => {
+        return !!document.getClosest(block.key, parent => parent.type == type)
+      })
+
+      if (isList && isType) {
+        change
+        .setBlocks(DEFAULT_NODE)
+        .unwrapBlock('bulleted-list')
+        .unwrapBlock('numbered-list')
+      } else if (isList) {
+        change
+        .unwrapBlock(
+          type == 'bulleted-list' ? 'numbered-list' : 'bulleted-list'
+        )
+        .wrapBlock(type)
+      } else {
+        change.setBlocks('list-item').wrapBlock(type)
+      }
+    }
+
+    this.onChange(change)
+  }
+
     /**
-     * When a block button is clicked, toggle the block type.
+     * Save content
      *
      * @param {Event} event
-     * @param {String} type
      */
-    onClickBlock = (event, type) => {
-        event.preventDefault()
-        const { value } = this.state
-        const change = value.change()
-        const { document } = value
+    onSave(event) {
+      console.log("save");
+      const { value } = this.state;
 
-        // Handle everything but list buttons.
-        if (type != 'bulleted-list' && type != 'numbered-list') {
-            const isActive = this.hasBlock(type)
-            const isList = this.hasBlock('list-item')
-
-            if (isList) {
-                change
-                    .setBlocks(isActive ? DEFAULT_NODE : type)
-                    .unwrapBlock('bulleted-list')
-                    .unwrapBlock('numbered-list')
-            } else {
-                change.setBlocks(isActive ? DEFAULT_NODE : type)
-            }
-        } else {
-
-            // Handle the extra wrapping required for list buttons.
-            const isList = this.hasBlock('list-item')
-            const isType = value.blocks.some(block => {
-                return !!document.getClosest(block.key, parent => parent.type == type)
-            })
-
-            if (isList && isType) {
-                change
-                    .setBlocks(DEFAULT_NODE)
-                    .unwrapBlock('bulleted-list')
-                    .unwrapBlock('numbered-list')
-            } else if (isList) {
-                change
-                    .unwrapBlock(
-                        type == 'bulleted-list' ? 'numbered-list' : 'bulleted-list'
-                    )
-                    .wrapBlock(type)
-            } else {
-                change.setBlocks('list-item').wrapBlock(type)
-            }
-        }
-
-        this.onChange(change)
+      const str = state.serializeDocument(value.document);
+      console.log(str);
     }
 
      
 
-    /**
-     * Render a Slate node.
-     *
-     * @param {Object} props
-     * @return {Element}
-     */
+  /**
+   * Render a Slate node.
+   *
+   * @param {Object} props
+   * @return {Element}
+   */
 
-    renderNode = props => {
-        const { attributes, children, node } = props
-        switch (node.type) {
-        case 'block-quote':
-            return <blockquote {...attributes}>{children}</blockquote>
-        case 'bulleted-list':
-            return <ul {...attributes}>{children}</ul>
-        case 'header_one':
-            return <h1 {...attributes}>{children}</h1>
-        case 'header_two':
-            return <h2 {...attributes}>{children}</h2>
-        case 'list-item':
-            return <li {...attributes}>{children}</li>
-        case 'numbered-list':
-            return <ol {...attributes}>{children}</ol>
-        }
+  renderNode = props => {
+    const { attributes, children, node } = props
+
+    switch (node.type) {
+      case 'block-quote':
+      return <blockquote {...attributes}>{children}</blockquote>
+      case 'bulleted-list':
+      return <ul {...attributes}>{children}</ul>
+      case 'header_one':
+      return <h1 {...attributes}>{children}</h1>
+      case 'header_two':
+      return <h2 {...attributes}>{children}</h2>
+      case 'list-item':
+      return <li {...attributes}>{children}</li>
+      case 'numbered-list':
+      return <ol {...attributes}>{children}</ol>
+      case 'image':
+      return <img src={node.data.get('src')} alt={node.data.get('')}/>
     }
+  }
 
   renderMark = props => {
     const { children, mark } = props
@@ -365,6 +379,8 @@ class SeafileEditor extends React.Component {
   }
 
   renderToolbar = () => {
+
+    const onSave = event => this.onSave(event)
     return (
       <div className="menu toolbar-menu">
       {this.renderMarkButton('BOLD', 'format_bold')}
@@ -376,6 +392,9 @@ class SeafileEditor extends React.Component {
       {this.renderBlockButton('block-quote', 'format_quote')}
       {this.renderBlockButton('numbered-list', 'format_list_numbered')}
       {this.renderBlockButton('bulleted-list', 'format_list_bulleted')}
+      <span className="button" onMouseDown={onSave} data-active="true">
+          <span className="material-icons">save</span>
+      </span>
       </div>
     )
   }
