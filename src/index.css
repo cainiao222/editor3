@@ -193,7 +193,6 @@ input:focus {
   padding: 1px 18px 17px;
   margin: 0 -20px;
   border-bottom: 2px solid #eee;
-  margin-bottom: 20px;
 }
 
 .toolbar-menu .search {
@@ -271,6 +270,12 @@ input:focus {
   display: inline-block;
 }
 
+.EditorDemo {
+  width: 60%;
+  margin-left: 20%;
+  border: 1px solid #bbb;
+}
 .editor {
   background: #fff;
+  padding: 4px 4px;
 }

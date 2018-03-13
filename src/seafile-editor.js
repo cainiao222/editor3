@@ -2,6 +2,10 @@ import React from 'react';
 import { Editor } from 'slate-react';
 import { Value } from 'slate';
 
+import FontAwesomeIcon from '@fortawesome/react-fontawesome'
+import { faCoffee } from '@fortawesome/fontawesome-free-solid'
+
+
 const { State } = require('markup-it');
 const markdown = require('markup-it/lib/markdown');
 
@@ -12,6 +16,7 @@ const document = state.deserializeToDocument('Hello *World*  **WORLD** _FOLD_ `b
 const initialValue = Value.create({document: document})
 const DEFAULT_NODE = 'paragraph'
 
+console.log(JSON.stringify(document.toJSON(), null, '  '))
 
 class SeafileEditor extends React.Component {
 
@@ -20,16 +25,16 @@ class SeafileEditor extends React.Component {
   }
 
   /**
-   * Check if the current selection has a mark with `type` in it.
-   *
-   * @param {String} type
-   * @return {Boolean}
-   */
+  * Check if the current selection has a mark with `type` in it.
+  *
+  * @param {String} type
+  * @return {Boolean}
+  */
 
-   hasMark = type => {
-     const { value } = this.state
-     return value.activeMarks.some(mark => mark.type == type)
-   }
+  hasMark = type => {
+    const { value } = this.state
+    return value.activeMarks.some(mark => mark.type == type)
+  }
 
   /**
    * Check if the any of the currently selected blocks are of `type`.
@@ -395,6 +400,7 @@ class SeafileEditor extends React.Component {
       <span className="button" onMouseDown={onSave} data-active="true">
           <span className="material-icons">save</span>
       </span>
+      <FontAwesomeIcon icon={faCoffee} />
       </div>
     )
   }
