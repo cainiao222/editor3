@@ -271,11 +271,10 @@ input:focus {
 }
 
 .EditorDemo {
-  width: 60%;
-  margin-left: 20%;
   border: 1px solid #bbb;
 }
 .editor {
   background: #fff;
   padding: 4px 4px;
+  min-height: 100%;
 }

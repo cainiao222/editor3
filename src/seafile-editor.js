@@ -4,24 +4,61 @@ import { Value } from 'slate';
 
 import FontAwesomeIcon from '@fortawesome/react-fontawesome'
 import { faCoffee } from '@fortawesome/fontawesome-free-solid'
+import { SeafileAPI } from 'seafile-js';
+
+import { Tree } from './tree';
+import { serverConfig } from './config'
+
+
+const repoID = serverConfig.repoID;
+const filePath = "/test.md";
+const fileName = "test.md";
+
+const seafileAPI = new SeafileAPI(serverConfig.server, serverConfig.username, serverConfig.password);
 
 
 const { State } = require('markup-it');
 const markdown = require('markup-it/lib/markdown');
 
 const state = State.create(markdown);
-const document = state.deserializeToDocument('Hello *World*  **WORLD** _FOLD_ `block`\n## Header\n![fdf](https://download.seafile.top/media/img/seafile-logo.png)\n## header3');
+const document = state.deserializeToDocument('Hello *World*  **WORLD** _FOLD_ `block`\n## header3');
 
 
 const initialValue = Value.create({document: document})
 const DEFAULT_NODE = 'paragraph'
 
-console.log(JSON.stringify(document.toJSON(), null, '  '))
+function updateFile(uploadLink, filePath, fileName, content) {
+  var formData = new FormData();
+  formData.append("target_file", filePath);
+  formData.append("filename", fileName);
+  var blob = new Blob([content], { type: "text/plain"});
+  formData.append("file", blob);
+  var request = new XMLHttpRequest();
+  request.open("POST", uploadLink);
+  request.send(formData);
+}
 
 class SeafileEditor extends React.Component {
 
   state = {
     value: initialValue,
+  }
+
+  componentDidMount() {
+    seafileAPI.login().then((response) => {
+
+      seafileAPI.getFileDownloadLink(repoID, filePath).then((response) => {
+        seafileAPI.getFileContent(response.data).then((response) => {
+          const state = State.create(markdown);
+          const document = state.deserializeToDocument(response.data);
+          const value = Value.create({document: document})
+          this.setState({
+            value: value,
+          })
+        })
+      })
+
+    })
   }
 
   /**
@@ -33,7 +70,7 @@ class SeafileEditor extends React.Component {
 
   hasMark = type => {
     const { value } = this.state
-    return value.activeMarks.some(mark => mark.type == type)
+    return value.activeMarks.some(mark => mark.type === type)
   }
 
   /**
@@ -45,7 +82,7 @@ class SeafileEditor extends React.Component {
 
   hasBlock = type => {
     const { value } = this.state
-    return value.blocks.some(node => node.type == type)
+    return value.blocks.some(node => node.type === type)
   }
 
   onChange = ({ value }) => {
@@ -118,12 +155,12 @@ class SeafileEditor extends React.Component {
     const type = this.getType(chars)
 
     if (!type) return
-    if (type == 'list-item' && startBlock.type == 'list-item') return
+    if (type === 'list-item' && startBlock.type === 'list-item') return
     event.preventDefault()
 
     change.setBlocks(type)
 
-    if (type == 'list-item') {
+    if (type === 'list-item') {
       change.wrapBlock('bulleted-list')
     }
 
@@ -142,16 +179,16 @@ class SeafileEditor extends React.Component {
   onBackspace = (event, change) => {
     const { value } = change
     if (value.isExpanded) return
-    if (value.startOffset != 0) return
+    if (value.startOffset !== 0) return
 
     const { startBlock } = value
-    if (startBlock.type == 'paragraph') return
+    if (startBlock.type !== 'paragraph') return
 
     event.preventDefault()
     change.setBlocks('paragraph')
 
     const { document } = value
-    if (startBlock.type == 'list-item') {
+    if (startBlock.type === 'list-item') {
       const pNode = document.getParent(startBlock.key)
       // unwrap the parent 'numbered-list' or 'bulleted-list'
       change.unwrapBlock(pNode.type)
@@ -173,18 +210,18 @@ class SeafileEditor extends React.Component {
     if (value.isExpanded) return
 
     const { startBlock, startOffset, endOffset } = value
-    if (startOffset == 0 && startBlock.text.length == 0)
+    if (startOffset === 0 && startBlock.text.length === 0)
       return this.onBackspace(event, change)
-    if (endOffset != startBlock.text.length) return
+    if (endOffset !== startBlock.text.length) return
 
     if (
-      startBlock.type != 'header_one' &&
-      startBlock.type != 'header_two' &&
-      startBlock.type != 'header_three' &&
-      startBlock.type != 'header_four' &&
-      startBlock.type != 'header_five' &&
-      startBlock.type != 'header_six' &&
-      startBlock.type != 'block-quote'
+      startBlock.type !== 'header_one' &&
+      startBlock.type !== 'header_two' &&
+      startBlock.type !== 'header_three' &&
+      startBlock.type !== 'header_four' &&
+      startBlock.type !== 'header_five' &&
+      startBlock.type !== 'header_six' &&
+      startBlock.type !== 'block-quote'
     ) {
       return
     }
@@ -223,7 +260,7 @@ class SeafileEditor extends React.Component {
     const { document } = value
 
     // Handle everything but list buttons.
-    if (type != 'bulleted-list' && type != 'numbered-list') {
+    if (type !== 'bulleted-list' && type !== 'numbered-list') {
       const isActive = this.hasBlock(type)
       const isList = this.hasBlock('list-item')
 
@@ -239,7 +276,7 @@ class SeafileEditor extends React.Component {
       // Handle the extra wrapping required for list buttons.
       const isList = this.hasBlock('list-item')
       const isType = value.blocks.some(block => {
-        return !!document.getClosest(block.key, parent => parent.type == type)
+        return !!document.getClosest(block.key, parent => parent.type === type)
       })
 
       if (isList && isType) {
@@ -250,7 +287,7 @@ class SeafileEditor extends React.Component {
       } else if (isList) {
         change
         .unwrapBlock(
-          type == 'bulleted-list' ? 'numbered-list' : 'bulleted-list'
+          type === 'bulleted-list' ? 'numbered-list' : 'bulleted-list'
         )
         .wrapBlock(type)
       } else {
@@ -267,11 +304,13 @@ class SeafileEditor extends React.Component {
      * @param {Event} event
      */
     onSave(event) {
-      console.log("save");
       const { value } = this.state;
 
       const str = state.serializeDocument(value.document);
       console.log(str);
+      seafileAPI.getUpdateLink(repoID, "/").then((response) => {
+        updateFile(response.data, filePath, fileName, str);
+      });
     }
 
      
@@ -368,15 +407,20 @@ class SeafileEditor extends React.Component {
           <div>SeafileEditor</div>
           {this.renderToolbar()}
           </div>
-        <div>
-          <div className="editor gitbook-markdown-body">
-            <Editor
-              value={this.state.value}
-              onChange={this.onChange}
-              onKeyDown={this.onKeyDown}
-              renderNode={this.renderNode}
-              renderMark={this.renderMark}
-            />
+        <div className="container-fluid">
+          <div className="row">
+            <div className="left-panel col-md-2">
+              <Tree />
+            </div>
+            <div className="editor gitbook-markdown-body right-panel col-md-10">
+              <Editor
+                value={this.state.value}
+                onChange={this.onChange}
+                onKeyDown={this.onKeyDown}
+                renderNode={this.renderNode}
+                renderMark={this.renderMark}
+              />
+            </div>
           </div>
         </div>
       </div>
