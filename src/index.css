@@ -278,3 +278,7 @@ input:focus {
   padding: 4px 4px;
   min-height: 100%;
 }
+
+.editor pre {
+  margin-bottom: 0;
+}

@@ -1,6 +1,8 @@
 import React from 'react';
 import { Editor } from 'slate-react';
 import { Value } from 'slate';
+import EditCode from 'slate-edit-code'
+
 
 import FontAwesomeIcon from '@fortawesome/react-fontawesome'
 import { faCoffee } from '@fortawesome/fontawesome-free-solid'
@@ -27,6 +29,8 @@ const document = state.deserializeToDocument('Hello *World*  **WORLD** _FOLD_ `b
 const initialValue = Value.create({document: document})
 const DEFAULT_NODE = 'paragraph'
 
+
+
 function updateFile(uploadLink, filePath, fileName, content) {
   var formData = new FormData();
   formData.append("target_file", filePath);
@@ -37,6 +41,80 @@ function updateFile(uploadLink, filePath, fileName, content) {
   request.open("POST", uploadLink);
   request.send(formData);
 }
+
+const editCode = EditCode()
+
+function MyPlugin(options) {
+  return {
+
+    /**
+    * On return, if at the end of a node type that should not be extended,
+    * create a new paragraph below it.
+    *
+    * @param {Event} event
+    * @param {Change} change
+    */
+
+    onEnter(event, change) {
+      const { value } = change
+      if (value.isExpanded) return
+
+      const { startBlock, startOffset, endOffset } = value
+      /*
+      if (startOffset === 0 && startBlock.text.length === 0)
+        return this.onBackspace(event, change)
+      */
+      //console.log(startBlock)
+      if (endOffset !== startBlock.text.length) return
+
+      /* enter code block if put ``` */
+      if (startBlock.text === '```') {
+        event.preventDefault()
+        editCode.changes.wrapCodeBlockByKey(change, startBlock.key)
+        // move the cursor to the start of new code block
+        change.collapseToStartOf(change.value.document.getDescendant(startBlock.key))
+        // remove string '```'
+        change.deleteForward(3)
+        return true
+      }
+
+      /*
+      if (
+        startBlock.type !== 'header_one' &&
+        startBlock.type !== 'header_two' &&
+        startBlock.type !== 'header_three' &&
+        startBlock.type !== 'header_four' &&
+        startBlock.type !== 'header_five' &&
+        startBlock.type !== 'header_six' &&
+        startBlock.type !== 'block-quote'
+      ) {
+        return;
+      }
+      */
+
+
+      /* create a new paragraph */
+      //event.preventDefault()
+      //change.splitBlock().setBlocks('paragraph')
+      //return true
+
+    },
+
+    onKeyDown(event, change, editor) {
+      switch (event.key) {
+      case 'Enter':
+        return this.onEnter(event, change)
+      }
+    }
+
+  }
+}
+
+const plugins = [
+  editCode,
+  MyPlugin(),
+]
+
 
 class SeafileEditor extends React.Component {
 
@@ -133,8 +211,6 @@ class SeafileEditor extends React.Component {
         return this.onSpace(event, change)
       case 'Backspace':
         return this.onBackspace(event, change)
-      case 'Enter':
-        return this.onEnter(event, change)
     }
   }
 
@@ -177,12 +253,16 @@ class SeafileEditor extends React.Component {
   */
 
   onBackspace = (event, change) => {
+    return;
+    /*
     const { value } = change
     if (value.isExpanded) return
     if (value.startOffset !== 0) return
 
     const { startBlock } = value
+    console.log(startBlock.type)
     if (startBlock.type !== 'paragraph') return
+
 
     event.preventDefault()
     change.setBlocks('paragraph')
@@ -195,41 +275,10 @@ class SeafileEditor extends React.Component {
     }
 
     return true
+    */
   }
 
-  /**
-  * On return, if at the end of a node type that should not be extended,
-  * create a new paragraph below it.
-  *
-  * @param {Event} event
-  * @param {Change} change
-  */
 
-  onEnter = (event, change) => {
-    const { value } = change
-    if (value.isExpanded) return
-
-    const { startBlock, startOffset, endOffset } = value
-    if (startOffset === 0 && startBlock.text.length === 0)
-      return this.onBackspace(event, change)
-    if (endOffset !== startBlock.text.length) return
-
-    if (
-      startBlock.type !== 'header_one' &&
-      startBlock.type !== 'header_two' &&
-      startBlock.type !== 'header_three' &&
-      startBlock.type !== 'header_four' &&
-      startBlock.type !== 'header_five' &&
-      startBlock.type !== 'header_six' &&
-      startBlock.type !== 'block-quote'
-    ) {
-      return
-    }
-
-    event.preventDefault()
-    change.splitBlock().setBlocks('paragraph')
-    return true
-  }
 
 
 
@@ -307,7 +356,7 @@ class SeafileEditor extends React.Component {
       const { value } = this.state;
 
       const str = state.serializeDocument(value.document);
-      console.log(str);
+      //console.log(str);
       seafileAPI.getUpdateLink(repoID, "/").then((response) => {
         updateFile(response.data, filePath, fileName, str);
       });
@@ -340,6 +389,14 @@ class SeafileEditor extends React.Component {
       return <ol {...attributes}>{children}</ol>
       case 'image':
       return <img src={node.data.get('src')} alt={node.data.get('')}/>
+      case 'code_block':
+      return (
+        <div className="code" {...attributes}>
+        {children}
+        </div>
+      );
+      case 'code_line':
+      return <pre {...attributes}>{children}</pre>;
     }
   }
 
@@ -415,6 +472,7 @@ class SeafileEditor extends React.Component {
             <div className="editor gitbook-markdown-body right-panel col-md-10">
               <Editor
                 value={this.state.value}
+                plugins={plugins}
                 onChange={this.onChange}
                 onKeyDown={this.onKeyDown}
                 renderNode={this.renderNode}
