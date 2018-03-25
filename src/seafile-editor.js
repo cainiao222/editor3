@@ -4,9 +4,6 @@ import { Value } from 'slate';
 import EditCode from 'slate-edit-code'
 import EditTable from 'slate-edit-table'
 
-
-import FontAwesomeIcon from '@fortawesome/react-fontawesome'
-import { faCoffee } from '@fortawesome/fontawesome-free-solid'
 import { SeafileAPI } from 'seafile-js';
 
 import { Tree } from './tree';
@@ -563,7 +560,6 @@ class SeafileEditor extends React.Component {
       <span className="button" onMouseDown={onSave} data-active="true">
           <span className="material-icons">save</span>
       </span>
-      <FontAwesomeIcon icon={faCoffee} />
       </div>
     )
   }
