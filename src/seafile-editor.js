@@ -3,6 +3,7 @@ import { Editor } from 'slate-react';
 import { Value } from 'slate';
 import EditCode from 'slate-edit-code'
 import EditTable from 'slate-edit-table'
+import EditList from 'slate-edit-list'
 
 import { SeafileAPI } from 'seafile-js';
 
@@ -42,6 +43,7 @@ function updateFile(uploadLink, filePath, fileName, content) {
 
 const editCode = EditCode()
 const editTable = EditTable()
+const editList = EditList()
 
 function MyPlugin(options) {
   return {
@@ -109,6 +111,7 @@ function MyPlugin(options) {
 const plugins = [
   editCode,
   editTable,
+  editList,
   MyPlugin(),
 ]
 
@@ -176,7 +179,7 @@ class SeafileEditor extends React.Component {
       case '*':
       case '-':
       case '+':
-      return 'list-item'
+      return 'list_item'
       case '>':
       return 'block-quote'
       case '#':
@@ -228,13 +231,13 @@ class SeafileEditor extends React.Component {
     const type = this.getType(chars)
 
     if (!type) return
-    if (type === 'list-item' && startBlock.type === 'list-item') return
+    if (type === 'list_item' && startBlock.type === 'list_item') return
     event.preventDefault()
 
     change.setBlocks(type)
 
-    if (type === 'list-item') {
-      change.wrapBlock('bulleted-list')
+    if (type === 'list_item') {
+      change.wrapBlock('ul_list')
     }
 
     change.extendToStartOf(startBlock).delete()
@@ -306,21 +309,21 @@ class SeafileEditor extends React.Component {
     const { document } = value
 
     // Handle everything but list buttons.
-    if (type !== 'bulleted-list' && type !== 'numbered-list') {
+    if (type !== 'ol_list' && type !== 'ul_list') {
       const isActive = this.hasBlock(type)
-      const isList = this.hasBlock('list-item')
+      const isList = this.hasBlock('list_item')
 
       if (isList) {
         change
         .setBlocks(isActive ? DEFAULT_NODE : type)
-        .unwrapBlock('bulleted-list')
-        .unwrapBlock('numbered-list')
+        .unwrapBlock('ul_list')
+        .unwrapBlock('ol_list')
       } else {
         change.setBlocks(isActive ? DEFAULT_NODE : type)
       }
     } else {
       // Handle the extra wrapping required for list buttons.
-      const isList = this.hasBlock('list-item')
+      const isList = this.hasBlock('list_item')
       const isType = value.blocks.some(block => {
         return !!document.getClosest(block.key, parent => parent.type === type)
       })
@@ -328,16 +331,16 @@ class SeafileEditor extends React.Component {
       if (isList && isType) {
         change
         .setBlocks(DEFAULT_NODE)
-        .unwrapBlock('bulleted-list')
-        .unwrapBlock('numbered-list')
+        .unwrapBlock('ol_list')
+        .unwrapBlock('ul_list')
       } else if (isList) {
         change
         .unwrapBlock(
-          type === 'bulleted-list' ? 'numbered-list' : 'bulleted-list'
+          type === 'ul_list' ? 'ol_list' : 'ul_list'
         )
         .wrapBlock(type)
       } else {
-        change.setBlocks('list-item').wrapBlock(type)
+        change.setBlocks('list_item').wrapBlock(type)
       }
     }
 
@@ -415,15 +418,15 @@ class SeafileEditor extends React.Component {
     switch (node.type) {
       case 'block-quote':
         return <blockquote {...attributes}>{children}</blockquote>
-      case 'bulleted-list':
+      case 'ul_list':
         return <ul {...attributes}>{children}</ul>
       case 'header_one':
         return <h1 {...attributes}>{children}</h1>
       case 'header_two':
         return <h2 {...attributes}>{children}</h2>
-      case 'list-item':
+      case 'list_item':
         return <li {...attributes}>{children}</li>
-      case 'numbered-list':
+      case 'ol_list':
         return <ol {...attributes}>{children}</ol>
       case 'image':
         return <img src={node.data.get('src')} alt={node.data.get('')}/>
@@ -553,8 +556,8 @@ class SeafileEditor extends React.Component {
       {this.renderBlockButton('header_one', 'looks_one')}
       {this.renderBlockButton('header_two', 'looks_two')}
       {this.renderBlockButton('block-quote', 'format_quote')}
-      {this.renderBlockButton('numbered-list', 'format_list_numbered')}
-      {this.renderBlockButton('bulleted-list', 'format_list_bulleted')}
+      {this.renderBlockButton('ol_list', 'format_list_numbered')}
+      {this.renderBlockButton('ul_list', 'format_list_bulleted')}
       <span className="button" onMouseDown={onToggleCode} data-active="true">
           <span className="material-icons">code</span>
       </span>
