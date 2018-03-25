@@ -347,20 +347,39 @@ class SeafileEditor extends React.Component {
     this.onChange(change)
   }
 
-    /**
-     * Save content
-     *
-     * @param {Event} event
-     */
-    onSave(event) {
-      const { value } = this.state;
-
-      const str = state.serializeDocument(value.document);
-      //console.log(str);
-      seafileAPI.getUpdateLink(repoID, "/").then((response) => {
-        updateFile(response.data, filePath, fileName, str);
-      });
+  /**
+   * Toggle inline code or code block
+   *
+   * @param {Event} event
+   */
+  onToggleCode(event) {
+    event.preventDefault()
+    const { value } = this.state
+    const { selection } = value
+    const change = value.change()
+    if (selection.isCollapsed) {
+      // if selection is collapsed
+      editCode.changes.toggleCodeBlock(change)
+    } else {
+      change.toggleMark('CODE')
     }
+    this.onChange(change)
+  }
+
+  /**
+   * Save content
+   *
+   * @param {Event} event
+   */
+  onSave(event) {
+    const { value } = this.state;
+
+    const str = state.serializeDocument(value.document);
+    //console.log(str);
+    seafileAPI.getUpdateLink(repoID, "/").then((response) => {
+      updateFile(response.data, filePath, fileName, str);
+    });
+  }
 
      
 
@@ -488,17 +507,20 @@ class SeafileEditor extends React.Component {
   renderToolbar = () => {
 
     const onSave = event => this.onSave(event)
+    const onToggleCode = event => this.onToggleCode(event)
     return (
       <div className="menu toolbar-menu">
       {this.renderMarkButton('BOLD', 'format_bold')}
       {this.renderMarkButton('ITALIC', 'format_italic')}
       {this.renderMarkButton('UNDERLINED', 'format_underlined')}
-      {this.renderMarkButton('CODE', 'code')}
       {this.renderBlockButton('header_one', 'looks_one')}
       {this.renderBlockButton('header_two', 'looks_two')}
       {this.renderBlockButton('block-quote', 'format_quote')}
       {this.renderBlockButton('numbered-list', 'format_list_numbered')}
       {this.renderBlockButton('bulleted-list', 'format_list_bulleted')}
+      <span className="button" onMouseDown={onToggleCode} data-active="true">
+          <span className="material-icons">code</span>
+      </span>
       <span className="button" onMouseDown={onSave} data-active="true">
           <span className="material-icons">save</span>
       </span>
