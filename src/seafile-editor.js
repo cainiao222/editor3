@@ -2,6 +2,7 @@ import React from 'react';
 import { Editor } from 'slate-react';
 import { Value } from 'slate';
 import EditCode from 'slate-edit-code'
+import EditTable from 'slate-edit-table'
 
 
 import FontAwesomeIcon from '@fortawesome/react-fontawesome'
@@ -43,6 +44,7 @@ function updateFile(uploadLink, filePath, fileName, content) {
 }
 
 const editCode = EditCode()
+const editTable = EditTable()
 
 function MyPlugin(options) {
   return {
@@ -112,6 +114,7 @@ function MyPlugin(options) {
 
 const plugins = [
   editCode,
+  editTable,
   MyPlugin(),
 ]
 
@@ -367,6 +370,24 @@ class SeafileEditor extends React.Component {
   }
 
   /**
+   * Add table
+   *
+   * @param {Event} event
+   */
+  onAddTable(event) {
+    event.preventDefault()
+    const { value } = this.state
+    const { selection } = value
+    const change = value.change()
+    if (editTable.utils.isSelectionInTable(value)) {
+      editTable.changes.removeTable(change)
+    } else {
+      editTable.changes.insertTable(change, 2, 2)
+    }
+    this.onChange(change)
+  }
+
+  /**
    * Save content
    *
    * @param {Event} event
@@ -392,30 +413,48 @@ class SeafileEditor extends React.Component {
 
   renderNode = props => {
     const { attributes, children, node } = props
+    let textAlign;
 
     switch (node.type) {
       case 'block-quote':
-      return <blockquote {...attributes}>{children}</blockquote>
+        return <blockquote {...attributes}>{children}</blockquote>
       case 'bulleted-list':
-      return <ul {...attributes}>{children}</ul>
+        return <ul {...attributes}>{children}</ul>
       case 'header_one':
-      return <h1 {...attributes}>{children}</h1>
+        return <h1 {...attributes}>{children}</h1>
       case 'header_two':
-      return <h2 {...attributes}>{children}</h2>
+        return <h2 {...attributes}>{children}</h2>
       case 'list-item':
-      return <li {...attributes}>{children}</li>
+        return <li {...attributes}>{children}</li>
       case 'numbered-list':
-      return <ol {...attributes}>{children}</ol>
+        return <ol {...attributes}>{children}</ol>
       case 'image':
-      return <img src={node.data.get('src')} alt={node.data.get('')}/>
+        return <img src={node.data.get('src')} alt={node.data.get('')}/>
       case 'code_block':
-      return (
-        <div className="code" {...attributes}>
-        {children}
-        </div>
-      );
+        return (
+          <div className="code" {...attributes}>
+          {children}
+          </div>
+        );
       case 'code_line':
-      return <pre {...attributes}>{children}</pre>;
+        return <pre {...attributes}>{children}</pre>;
+      case 'table':
+        return (
+          <table>
+            <tbody {...attributes}>{children}</tbody>
+          </table>
+        );
+      case 'table_row':
+        return <tr {...attributes}>{children}</tr>;
+      case 'table_cell':
+        textAlign = node.get('data').get('textAlign');
+        textAlign = ['left', 'right', 'center'].indexOf(textAlign) === -1
+            ? 'left' : textAlign;
+        return (
+          <td style={{ textAlign }} {...attributes}>
+          {children}
+          </td>
+        );
     }
   }
 
@@ -508,6 +547,7 @@ class SeafileEditor extends React.Component {
 
     const onSave = event => this.onSave(event)
     const onToggleCode = event => this.onToggleCode(event)
+    const onAddTable = event => this.onAddTable(event)
     return (
       <div className="menu toolbar-menu">
       {this.renderMarkButton('BOLD', 'format_bold')}
@@ -520,6 +560,9 @@ class SeafileEditor extends React.Component {
       {this.renderBlockButton('bulleted-list', 'format_list_bulleted')}
       <span className="button" onMouseDown={onToggleCode} data-active="true">
           <span className="material-icons">code</span>
+      </span>
+      <span className="button" onMouseDown={onAddTable} data-active="true">
+          <span className="material-icons">grid_on</span>
       </span>
       <span className="button" onMouseDown={onSave} data-active="true">
           <span className="material-icons">save</span>
