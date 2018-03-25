@@ -99,6 +99,7 @@ function MyPlugin(options) {
       switch (event.key) {
       case 'Enter':
         return this.onEnter(event, change)
+
       }
     }
 
@@ -376,6 +377,9 @@ class SeafileEditor extends React.Component {
       editTable.changes.removeTable(change)
     } else {
       editTable.changes.insertTable(change, 2, 2)
+      // need to set table align, otherwise markup-it will throw error
+      editTable.changes.setColumnAlign(change, "left", 0)
+      editTable.changes.setColumnAlign(change, "left", 1)
     }
     this.onChange(change)
   }
