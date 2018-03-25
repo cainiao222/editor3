@@ -80,7 +80,7 @@ function MyPlugin(options) {
         return true
       }
 
-      /*
+      // create a paragraph node after 'enter' after a header line
       if (
         startBlock.type !== 'header_one' &&
         startBlock.type !== 'header_two' &&
@@ -92,14 +92,10 @@ function MyPlugin(options) {
       ) {
         return;
       }
-      */
 
-
-      /* create a new paragraph */
-      //event.preventDefault()
-      //change.splitBlock().setBlocks('paragraph')
-      //return true
-
+      event.preventDefault()
+      change.splitBlock().setBlocks('paragraph')
+      return true
     },
 
     onKeyDown(event, change, editor) {
