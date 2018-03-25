@@ -41,6 +41,26 @@ function updateFile(uploadLink, filePath, fileName, content) {
   request.send(formData);
 }
 
+/**
+ * A change function to standardize inserting images.
+ *
+ * @param {Change} change
+ * @param {String} src
+ * @param {Range} target
+ */
+function insertImage(change, src, target) {
+  if (target) {
+    change.select(target)
+  }
+
+  change.insertInline({
+    type: 'image',
+    isVoid: true,
+    data: { src },
+  })
+}
+
+
 const editCode = EditCode()
 const editTable = EditTable()
 const editList = EditList()
@@ -387,6 +407,23 @@ class SeafileEditor extends React.Component {
     this.onChange(change)
   }
 
+
+  /**
+   * Add image
+   *
+   * @param {Event} event
+   */
+  onAddImage(event) {
+    event.preventDefault()
+    const src = window.prompt('Enter the URL of the image:')
+    if (!src) return
+
+    const { value } = this.state
+    const change = value.change().call(insertImage, src)
+
+    this.onChange(change)
+  }
+
   /**
    * Save content
    *
@@ -548,6 +585,7 @@ class SeafileEditor extends React.Component {
     const onSave = event => this.onSave(event)
     const onToggleCode = event => this.onToggleCode(event)
     const onAddTable = event => this.onAddTable(event)
+    const onAddImage = event => this.onAddImage(event)
     return (
       <div className="menu toolbar-menu">
       {this.renderMarkButton('BOLD', 'format_bold')}
@@ -563,6 +601,9 @@ class SeafileEditor extends React.Component {
       </span>
       <span className="button" onMouseDown={onAddTable} data-active="true">
           <span className="material-icons">grid_on</span>
+      </span>
+      <span className="button" onMouseDown={onAddImage} data-active="true">
+          <span className="material-icons">image</span>
       </span>
       <span className="button" onMouseDown={onSave} data-active="true">
           <span className="material-icons">save</span>
