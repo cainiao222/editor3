@@ -37,6 +37,36 @@ Read instructions below for using assets from JavaScript and HTML.
 You can, however, create more top-level directories.<br>
 They will not be included in the production build so you can use them for things like documentation.
 
+## Quick Start
+
+Install dependency
+
+```
+npm install
+```
+
+create `src/config.js` with the following contents
+
+```
+const serverConfig = {
+  server: "https://download.seafile.top",
+  username: "xxx",
+  password: "xxx",
+  repoID: "xxxxxxx-xxxx-xxx-xxx-xxxx"
+}
+
+export { serverConfig }
+```
+
+Make sure you have a file `test.md` in the root of your Seafile library.
+
+Start the example application
+
+```
+npm start
+```
+
+
 ## Available Scripts
 
 In the project directory, you can run:
