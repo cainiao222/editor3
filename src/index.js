@@ -1,7 +1,7 @@
 // Import React!
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { SeafileEditor } from './seafile-editor';
+import { SeafileEditor } from './lib/seafile-editor';
 
 import 'gitbook-markdown-css/css/gitbook-markdown.css';
 import './index.css';
