@@ -1,45 +1,13 @@
 import React from 'react';
 import { Editor } from 'slate-react';
-import { Value } from 'slate';
 import EditCode from 'slate-edit-code'
 import EditTable from 'slate-edit-table'
 import EditList from 'slate-edit-list'
 
-import { SeafileAPI } from 'seafile-js';
-
 import { Tree } from './tree';
-import { serverConfig } from './config'
 
-
-const repoID = serverConfig.repoID;
-const filePath = "/test.md";
-const fileName = "test.md";
-
-const seafileAPI = new SeafileAPI(serverConfig.server, serverConfig.username, serverConfig.password);
-
-
-const { State } = require('markup-it');
-const markdown = require('markup-it/lib/markdown');
-
-const state = State.create(markdown);
-const document = state.deserializeToDocument('Hello *World*  **WORLD** _FOLD_ `block`\n## header3');
-
-
-const initialValue = Value.create({document: document})
 const DEFAULT_NODE = 'paragraph'
 
-
-
-function updateFile(uploadLink, filePath, fileName, content) {
-  var formData = new FormData();
-  formData.append("target_file", filePath);
-  formData.append("filename", fileName);
-  var blob = new Blob([content], { type: "text/plain"});
-  formData.append("file", blob);
-  var request = new XMLHttpRequest();
-  request.open("POST", uploadLink);
-  request.send(formData);
-}
 
 /**
  * A change function to standardize inserting images.
@@ -138,25 +106,8 @@ const plugins = [
 
 class SeafileEditor extends React.Component {
 
-  state = {
-    value: initialValue,
-  }
-
   componentDidMount() {
-    seafileAPI.login().then((response) => {
 
-      seafileAPI.getFileDownloadLink(repoID, filePath).then((response) => {
-        seafileAPI.getFileContent(response.data).then((response) => {
-          const state = State.create(markdown);
-          const document = state.deserializeToDocument(response.data);
-          const value = Value.create({document: document})
-          this.setState({
-            value: value,
-          })
-        })
-      })
-
-    })
   }
 
   /**
@@ -165,9 +116,8 @@ class SeafileEditor extends React.Component {
   * @param {String} type
   * @return {Boolean}
   */
-
   hasMark = type => {
-    const { value } = this.state
+    const value = this.props.value
     return value.activeMarks.some(mark => mark.type === type)
   }
 
@@ -179,14 +129,9 @@ class SeafileEditor extends React.Component {
    */
 
   hasBlock = type => {
-    const { value } = this.state
+    const value = this.props.value
     return value.blocks.some(node => node.type === type)
   }
-
-  onChange = ({ value }) => {
-    this.setState({ value })
-  }
-
 
   /**
   * Get the block type for a series of auto-markdown shortcut `chars`.
@@ -430,15 +375,8 @@ class SeafileEditor extends React.Component {
    * @param {Event} event
    */
   onSave(event) {
-    const { value } = this.state;
-
-    const str = state.serializeDocument(value.document);
-    //console.log(str);
-    seafileAPI.getUpdateLink(repoID, "/").then((response) => {
-      updateFile(response.data, filePath, fileName, str);
-    });
+    this.props.onSave(event)
   }
-
      
 
   /**
@@ -562,13 +500,17 @@ class SeafileEditor extends React.Component {
         <div className="container-fluid">
           <div className="row">
             <div className="left-panel col-md-2">
-              <Tree />
+              <Tree
+                treeData={this.props.treeData}
+                isLoaded={this.props.isTreeDataLoaded}
+                onChange={this.props.onTreeChange}
+              />
             </div>
             <div className="editor gitbook-markdown-body right-panel col-md-10">
               <Editor
-                value={this.state.value}
+                value={this.props.value}
                 plugins={plugins}
-                onChange={this.onChange}
+                onChange={this.props.onChange}
                 onKeyDown={this.onKeyDown}
                 renderNode={this.renderNode}
                 renderMark={this.renderMark}
