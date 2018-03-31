@@ -3,11 +3,9 @@ import { Editor } from 'slate-react';
 import EditCode from 'slate-edit-code'
 import EditTable from 'slate-edit-table'
 import EditList from 'slate-edit-list'
-
 import { Tree } from './tree';
 
-const DEFAULT_NODE = 'paragraph'
-
+const DEFAULT_NODE = 'paragraph';
 
 /**
  * A change function to standardize inserting images.
@@ -29,9 +27,9 @@ function insertImage(change, src, target) {
 }
 
 
-const editCode = EditCode()
-const editTable = EditTable()
-const editList = EditList()
+const editCode = EditCode();
+const editTable = EditTable();
+const editList = EditList();
 
 function MyPlugin(options) {
   return {
@@ -309,7 +307,7 @@ class SeafileEditor extends React.Component {
       }
     }
 
-    this.onChange(change)
+    this.onChange(change);
   }
 
   /**
@@ -363,6 +361,7 @@ class SeafileEditor extends React.Component {
     const src = window.prompt('Enter the URL of the image:')
     if (!src) return
 
+	
     const { value } = this.state
     const change = value.change().call(insertImage, src)
 
@@ -378,7 +377,6 @@ class SeafileEditor extends React.Component {
     this.props.onSave(event)
   }
      
-
   /**
    * Render a Slate node.
    *
@@ -492,29 +490,31 @@ class SeafileEditor extends React.Component {
 
   render() {
     return (
-      <div>
+      <div className='textContainer'>
         <div className="topbar ">
-          <div>SeafileEditor</div>
-          {this.renderToolbar()}
-          </div>
+          <div className="title">SeafileEditor</div>
+            {this.renderToolbar()}
+        </div>
         <div className="container-fluid">
           <div className="row">
-            <div className="left-panel col-md-2">
+            <div className="left-panel">
               <Tree
-                treeData={this.props.treeData}
-                isLoaded={this.props.isTreeDataLoaded}
-                onChange={this.props.onTreeChange}
+                 treeData={this.props.treeData}
+                 isLoaded={this.props.isTreeDataLoaded}
+                 onChange={this.props.onTreeChange}
               />
             </div>
-            <div className="editor gitbook-markdown-body right-panel col-md-10">
-              <Editor
-                value={this.props.value}
-                plugins={plugins}
-                onChange={this.props.onChange}
-                onKeyDown={this.onKeyDown}
-                renderNode={this.renderNode}
-                renderMark={this.renderMark}
-              />
+            <div className="editorContainer">
+              <div className="editor gitbook-markdown-body right-panel">
+                <Editor
+                    value={this.props.value}
+                    plugins={plugins}
+                    onChange={this.props.onChange}
+                    onKeyDown={this.onKeyDown}
+                    renderNode={this.renderNode}
+                    renderMark={this.renderMark}
+                />
+              </div>
             </div>
           </div>
         </div>
@@ -524,10 +524,10 @@ class SeafileEditor extends React.Component {
 
   renderToolbar = () => {
 
-    const onSave = event => this.onSave(event)
-    const onToggleCode = event => this.onToggleCode(event)
-    const onAddTable = event => this.onAddTable(event)
-    const onAddImage = event => this.onAddImage(event)
+    const onSave = event => this.onSave(event);
+    const onToggleCode = event => this.onToggleCode(event);
+    const onAddTable = event => this.onAddTable(event);
+    const onAddImage = event => this.onAddImage(event);
     return (
       <div className="menu toolbar-menu">
       {this.renderMarkButton('BOLD', 'format_bold')}
@@ -556,8 +556,8 @@ class SeafileEditor extends React.Component {
 
 
   renderMarkButton = (type, icon) => {
-    const isActive = this.hasMark(type)
-    const onMouseDown = event => this.onClickMark(event, type)
+    const isActive = this.hasMark(type);
+    const onMouseDown = event => this.onClickMark(event, type);
     return (
       // eslint-disable-next-line react/jsx-no-bind
       <span className="button" onMouseDown={onMouseDown} data-active={isActive}>
@@ -575,8 +575,8 @@ class SeafileEditor extends React.Component {
   * @return {Element}
   */
   renderBlockButton = (type, icon) => {
-    const isActive = this.hasBlock(type)
-    const onMouseDown = event => this.onClickBlock(event, type)
+    const isActive = this.hasBlock(type);
+    const onMouseDown = event => this.onClickBlock(event, type);
 
     return (
       // eslint-disable-next-line react/jsx-no-bind
@@ -585,6 +585,6 @@ class SeafileEditor extends React.Component {
       </span>
     )
   }
-};
+}
 
 export { SeafileEditor };
