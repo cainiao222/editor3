@@ -505,7 +505,7 @@ class SeafileEditor extends React.Component {
               />
             </div>
             <div className="editorContainer">
-              <div className="editor gitbook-markdown-body right-panel">
+              <div className="editor article gitbook-markdown-body right-panel">
                 <Editor
                     value={this.props.value}
                     plugins={plugins}
