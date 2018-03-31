@@ -254,9 +254,9 @@ class SeafileEditor extends React.Component {
 
   onClickMark = (event, type) => {
     event.preventDefault()
-    const { value } = this.state
+    const value = this.props.value;
     const change = value.change().toggleMark(type)
-    this.onChange(change)
+    this.props.onChange(change)
   }
 
   /**
@@ -267,7 +267,7 @@ class SeafileEditor extends React.Component {
    */
   onClickBlock = (event, type) => {
     event.preventDefault()
-    const { value } = this.state
+    const value = this.props.value;
     const change = value.change()
     const { document } = value
 
@@ -307,7 +307,7 @@ class SeafileEditor extends React.Component {
       }
     }
 
-    this.onChange(change);
+    this.props.onChange(change);
   }
 
   /**
@@ -317,7 +317,7 @@ class SeafileEditor extends React.Component {
    */
   onToggleCode(event) {
     event.preventDefault()
-    const { value } = this.state
+    const value = this.props.value
     const { selection } = value
     const change = value.change()
     if (selection.isCollapsed) {
@@ -326,7 +326,7 @@ class SeafileEditor extends React.Component {
     } else {
       change.toggleMark('CODE')
     }
-    this.onChange(change)
+    this.props.onChange(change)
   }
 
   /**
@@ -336,7 +336,7 @@ class SeafileEditor extends React.Component {
    */
   onAddTable(event) {
     event.preventDefault()
-    const { value } = this.state
+    const value = this.props.value
     const { selection } = value
     const change = value.change()
     if (editTable.utils.isSelectionInTable(value)) {
@@ -347,7 +347,7 @@ class SeafileEditor extends React.Component {
       editTable.changes.setColumnAlign(change, "left", 0)
       editTable.changes.setColumnAlign(change, "left", 1)
     }
-    this.onChange(change)
+    this.props.onChange(change)
   }
 
 
@@ -361,7 +361,7 @@ class SeafileEditor extends React.Component {
     const src = window.prompt('Enter the URL of the image:')
     if (!src) return
 
-	
+
     const { value } = this.state
     const change = value.change().call(insertImage, src)
 
