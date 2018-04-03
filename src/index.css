@@ -248,6 +248,10 @@ input:focus {
   border-right: 1px solid rgb(230,230,221);
 }
 
+.treeContainer{
+    height: 100%;
+}
+
 .editorContainer {
   width: 80%;
   padding: 20px 0;
@@ -259,3 +263,4 @@ input:focus {
   bottom: 0;
   background-color: rgb(250,250,249);
 }
+

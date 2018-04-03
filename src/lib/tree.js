@@ -2,7 +2,6 @@ import React, { Component } from 'react';
 import SortableTree from 'react-sortable-tree';
 import FileExplorerTheme from 'react-sortable-tree-theme-file-explorer';
 
-
 class Tree extends Component {
 
   componentDidMount() {
@@ -14,7 +13,7 @@ class Tree extends Component {
 
   render() {
     return (
-      <div style={{ height: 400 }}>
+      <div className='treeContainer'>
         <SortableTree
           treeData={this.props.treeData}
           onChange={treeData => this.onChange(treeData)}
