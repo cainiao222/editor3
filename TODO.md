@@ -16,25 +16,27 @@ Release data: 2018.05.30
 ## Version beta 2
 
 * Improve table
+* [x] Improve CSS
+* Support FILES
 * Improve image
-* Improve Icons
-* Improve CSS
-* Improve code block
+* Choose an image from Seafile
+
 
 ## Future versions
 
 * Better support image (Integrating of https://github.com/ianstormtaylor/slate-plugins/tree/master/packages/slate-drop-or-paste-images)
+* Improve code block
 
 Not important
 
 * Support task list
 * Support quotation
+* Improve Icons
 
 Integrating into Seafile
 
 * Support TOC
-* Support FILES
-* Choose an image from Seafile
+
 
 ### Plain react markdown editor
 

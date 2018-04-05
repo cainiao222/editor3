@@ -63,10 +63,11 @@ class App extends React.Component {
         console.log(response.data);
         var children = response.data.map((item) => {
           return {
-            title: item.name
+            title: item.name,
+            isDirectory: item.type === 'dir' ? true : false,
           }
         })
-        var td = [ { title: '/', children: children }]
+        var td = [ { title: '/', isDirectory: true, children: children }]
         this.setState({
           isTreeDataLoaded: true,
           treeData: td
