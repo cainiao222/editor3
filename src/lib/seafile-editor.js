@@ -397,6 +397,14 @@ class SeafileEditor extends React.Component {
         return <h1 {...attributes}>{children}</h1>
       case 'header_two':
         return <h2 {...attributes}>{children}</h2>
+      case 'header_three':
+        return <h3 {...attributes}>{children}</h3>
+      case 'header_four':
+        return <h4 {...attributes}>{children}</h4>
+      case 'header_five':
+        return <h5 {...attributes}>{children}</h5>
+      case 'header_six':
+        return <h6 {...attributes}>{children}</h6>
       case 'list_item':
         return <li {...attributes}>{children}</li>
       case 'ol_list':
