@@ -3,7 +3,10 @@ import { Editor } from 'slate-react';
 import EditCode from 'slate-edit-code'
 import EditTable from 'slate-edit-table'
 import EditList from 'slate-edit-list'
+import InsertImages from 'slate-drop-or-paste-images'
 import { Tree } from './tree';
+import { Image } from './image';
+import { Inline, Node } from 'slate';
 
 const DEFAULT_NODE = 'paragraph';
 
@@ -30,6 +33,36 @@ function insertImage(change, src, target) {
 const editCode = EditCode();
 const editTable = EditTable();
 const editList = EditList();
+
+/*
+  When an image is pasted or dropped, insertImage() will be called.
+
+  insertImage creates an image node with `file` stored in `data`.
+*/
+const insertImages = InsertImages({
+  extensions: ['png'],
+  insertImage: (change, file, editor) => {
+    var node = Inline.create({
+      type: 'image',
+      isVoid: true,
+      data: {
+        file: file
+      }
+    })
+    // schedule image uploading
+    editor.props.uploadImage(file).then((imageURL) => {
+      // change the node property after image uploaded
+      const change2 = editor.props.value.change();
+      change2.setNodeByKey(node.key, {
+        data: {
+          src: imageURL
+        }
+      });
+      editor.props.onChange(change2);
+    })
+    return change.insertInline(node);
+  }
+});
 
 function MyPlugin(options) {
   return {
@@ -98,6 +131,7 @@ const plugins = [
   editCode,
   editTable,
   editList,
+  insertImages,
   MyPlugin(),
 ]
 
@@ -365,7 +399,7 @@ class SeafileEditor extends React.Component {
     const { value } = this.state
     const change = value.change().call(insertImage, src)
 
-    this.onChange(change)
+    this.props.onChange(change)
   }
 
   /**
@@ -385,7 +419,10 @@ class SeafileEditor extends React.Component {
    */
 
   renderNode = props => {
-    const { attributes, children, node } = props
+    /*
+       props contains  { attributes, children, node, isSelected, editor, parent, key }
+    */
+    const { attributes, children, node, isSelected } = props
     let textAlign;
 
     switch (node.type) {
@@ -410,7 +447,9 @@ class SeafileEditor extends React.Component {
       case 'ol_list':
         return <ol {...attributes}>{children}</ol>
       case 'image':
-        return <img src={node.data.get('src')} alt={node.data.get('')}/>
+        return <Image {...props} />
+      case 'image2':
+        return <Image {...props} />
       case 'code_block':
         return (
           <div className="code" {...attributes}>
@@ -506,14 +545,10 @@ class SeafileEditor extends React.Component {
         <div className="container-fluid">
           <div className="row">
             <div className="left-panel">
-              <Tree
-                 treeData={this.props.treeData}
-                 isLoaded={this.props.isTreeDataLoaded}
-                 onChange={this.props.onTreeChange}
-              />
+
             </div>
             <div className="editorContainer">
-              <div className="editor article gitbook-markdown-body right-panel">
+              <div className="editor article right-panel">
                 <Editor
                     value={this.props.value}
                     plugins={plugins}
@@ -521,6 +556,9 @@ class SeafileEditor extends React.Component {
                     onKeyDown={this.onKeyDown}
                     renderNode={this.renderNode}
                     renderMark={this.renderMark}
+                    onDrop={this.onDrop}
+                    uploadImage={this.props.uploadImage}
+                    getImageURL={this.props.getImageURL}
                 />
               </div>
             </div>

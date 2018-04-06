@@ -17,10 +17,9 @@ Release data: 2018.05.30
 
 * Improve table
 * [x] Improve CSS
+* Copy/paste image from clipboard
 * Support FILES
-* Improve image
 * Choose an image from Seafile
-
 
 ## Future versions
 

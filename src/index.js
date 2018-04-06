@@ -7,6 +7,7 @@ import './index.css';
 
 import { serverConfig } from './config'
 import { SeafileAPI } from 'seafile-js';
+import 'whatwg-fetch'
 
 import { Value } from 'slate';
 const { State } = require('markup-it');
@@ -36,6 +37,12 @@ function updateFile(uploadLink, filePath, fileName, content) {
   request.send(formData);
 }
 
+
+
+function getImageFileNameWithTimestamp() {
+  var d = Date.now();
+  return "image-" + d.toString() + ".png";
+}
  
 class App extends React.Component {
 
@@ -49,9 +56,12 @@ class App extends React.Component {
     seafileAPI.login().then((response) => {
 
       seafileAPI.getFileDownloadLink(repoID, filePath).then((response) => {
-        seafileAPI.getFileContent(response.data).then((response) => {
+        const url = response.data;
+        fetch(url).then(function(response) {
+          return response.text();
+        }).then((body) => {
           const state = State.create(markdown);
-          const document = state.deserializeToDocument(response.data);
+          const document = state.deserializeToDocument(body);
           const value = Value.create({document: document})
           this.setState({
             value: value,
@@ -95,6 +105,38 @@ class App extends React.Component {
     this.setState({ treeData })
   }
 
+  uploadImage = (imageFile) => {
+    return seafileAPI.getUploadLink(repoID, "/").then((response) => {
+      const uploadLink = response.data + "?ret-json=1";
+      console.log(uploadLink);
+      // change image file name
+      var name = getImageFileNameWithTimestamp();
+      var blob = imageFile.slice(0, -1, 'image/png');
+      var newFile = new File([blob], name, {type: 'image/png'});
+      var formData = new FormData();
+      formData.append("parent_dir", "/");
+      formData.append("file", newFile);
+      // upload the image
+      return fetch(uploadLink, {
+        method: "POST",
+        body: formData
+      })
+    }).then((response) => {
+      return response.json();
+    }).then((json) => {
+      // The returned json is a list of uploaded files, need to get the first one
+      var filename = json[0].name;
+      console.log(filename);
+      return this.getImageURL(filename);
+    });
+  }
+
+  getImageURL = (fileName) => {
+    var url = serverConfig.server + "/lib/" + repoID + "/file/" + fileName + "?raw=1";
+    console.log(url);
+    return url;
+  }
+
   render() {
     return (
       <div className="EditorDemo">
@@ -105,6 +147,8 @@ class App extends React.Component {
           treeData={this.state.treeData}
           isTreeDataLoaded={this.state.isTreeDataLoaded}
           onTreeChange={this.onTreeChange}
+          uploadImage={this.uploadImage}
+          getImageURL={this.getImageURL}
         />
       </div>
     )
