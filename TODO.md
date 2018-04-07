@@ -15,15 +15,15 @@ Release data: 2018.05.30
 
 ## Version beta 2
 
-* Improve table
+* [-] Improve table
 * [x] Improve CSS
-* Copy/paste image from clipboard
-* Support FILES
+* [x] Copy/paste image from clipboard
 * Choose an image from Seafile
+* Support FILES
 
 ## Future versions
 
-* Better support image (Integrating of https://github.com/ianstormtaylor/slate-plugins/tree/master/packages/slate-drop-or-paste-images)
+
 * Improve code block
 
 Not important

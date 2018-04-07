@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
-import SortableTree from 'react-sortable-tree';
+// import SortableTree from 'react-sortable-tree';
+import { SortableTreeWithoutDndContext as SortableTree } from 'react-sortable-tree';
 import FileExplorerTheme from 'react-sortable-tree-theme-file-explorer';
 
 class Tree extends Component {

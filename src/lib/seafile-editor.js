@@ -4,9 +4,10 @@ import EditCode from 'slate-edit-code'
 import EditTable from 'slate-edit-table'
 import EditList from 'slate-edit-list'
 import InsertImages from 'slate-drop-or-paste-images'
-import { Tree } from './tree';
+//import { Tree } from './tree';
+import FileTree from './file-tree';
 import { Image } from './image';
-import { Inline, Node } from 'slate';
+import { Inline } from 'slate';
 
 const DEFAULT_NODE = 'paragraph';
 
@@ -545,7 +546,11 @@ class SeafileEditor extends React.Component {
         <div className="container-fluid">
           <div className="row">
             <div className="left-panel">
-
+              <FileTree
+                treeData={this.props.treeData}
+                isLoaded={this.props.isTreeDataLoaded}
+                onChange={this.props.onTreeChange}
+              />
             </div>
             <div className="editorContainer">
               <div className="editor article right-panel">

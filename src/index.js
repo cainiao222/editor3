@@ -2,12 +2,16 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import { SeafileEditor } from './lib/seafile-editor';
+import HTML5Backend from 'react-dnd-html5-backend';
+import { DragDropContext } from 'react-dnd';
 
 import './index.css';
 
 import { serverConfig } from './config'
 import { SeafileAPI } from 'seafile-js';
 import 'whatwg-fetch'
+
+import Tree from './tree-view/tree';
 
 import { Value } from 'slate';
 const { State } = require('markup-it');
@@ -43,12 +47,12 @@ function getImageFileNameWithTimestamp() {
   var d = Date.now();
   return "image-" + d.toString() + ".png";
 }
- 
+
 class App extends React.Component {
 
   state = {
     value: initialValue,
-    treeData: [ ],
+    treeData: new Tree(),
     isTreeDataLoaded: false,
   }
 
@@ -69,22 +73,69 @@ class App extends React.Component {
         })
       })
 
+
       seafileAPI.listDir(repoID, dirPath).then((response) => {
         console.log(response.data);
+        // load the files and folder at the root of the library
         var children = response.data.map((item) => {
           return {
-            title: item.name,
-            isDirectory: item.type === 'dir' ? true : false,
+            name: item.name,
+            type: item.type === 'dir' ? 'dir' : 'file',
+            isExpanded: item.type === 'dir' ? true : false,
           }
         })
-        var td = [ { title: '/', isDirectory: true, children: children }]
+        // construct the tree object
+        var treeObject = {
+          name: '/',
+          type: 'dir',
+          isExpanded: true,
+          children: children
+        }
+        // parse the tree object to internal representation
+        var treeData = new Tree();
+        treeData.parse(treeObject);
+
         this.setState({
           isTreeDataLoaded: true,
-          treeData: td
+          treeData: treeData
         })
+
       })
 
     })
+
+    // for testing
+    /*
+    var treeData = new Tree();
+    var t = {
+      name: "/",
+      isExpanded: true,
+      type: "dir",
+      children: [
+        {
+          name: "test.md",
+          type: "file"
+        },
+        {
+          name: "images",
+          type: "dir",
+          isExpanded: true,
+          children: [
+            {
+              name: "screenshot.png",
+              type: "file"
+            }
+          ]
+        }
+      ]
+    }
+    treeData.parse(t);
+    this.setState({
+      isTreeDataLoaded: true,
+      treeData: treeData
+    })
+    */
+
   }
 
   onChange = ({ value }) => {
@@ -156,6 +207,7 @@ class App extends React.Component {
 
 }
 
+App = DragDropContext(HTML5Backend)(App)
 ReactDOM.render(
   <App />,
   document.getElementById('root')
