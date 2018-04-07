@@ -18,8 +18,14 @@ Release data: 2018.05.30
 * [-] Improve table
 * [x] Improve CSS
 * [x] Copy/paste image from clipboard
+* [] Change toolbar button icons
 * Choose an image from Seafile
 * Support FILES
+
+### Tree view
+
+* [] Folder/File icons
+
 
 ## Future versions
 

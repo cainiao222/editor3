@@ -166,6 +166,7 @@ class App extends React.Component {
       var newFile = new File([blob], name, {type: 'image/png'});
       var formData = new FormData();
       formData.append("parent_dir", "/");
+      formData.append("relative_path", "images");
       formData.append("file", newFile);
       // upload the image
       return fetch(uploadLink, {
@@ -183,7 +184,7 @@ class App extends React.Component {
   }
 
   getImageURL = (fileName) => {
-    var url = serverConfig.server + "/lib/" + repoID + "/file/" + fileName + "?raw=1";
+    var url = serverConfig.server + "/lib/" + repoID + "/file/images/" + fileName + "?raw=1";
     console.log(url);
     return url;
   }
