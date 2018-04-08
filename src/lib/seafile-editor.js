@@ -8,27 +8,9 @@ import InsertImages from 'slate-drop-or-paste-images'
 import FileTree from './file-tree';
 import { Image } from './image';
 import { Inline } from 'slate';
+import AddImageDialog from './add-image-dialog';
 
 const DEFAULT_NODE = 'paragraph';
-
-/**
- * A change function to standardize inserting images.
- *
- * @param {Change} change
- * @param {String} src
- * @param {Range} target
- */
-function insertImage(change, src, target) {
-  if (target) {
-    change.select(target)
-  }
-
-  change.insertInline({
-    type: 'image',
-    isVoid: true,
-    data: { src },
-  })
-}
 
 
 const editCode = EditCode();
@@ -138,6 +120,10 @@ const plugins = [
 
 
 class SeafileEditor extends React.Component {
+
+  state = {
+      showAddImageDialog: false
+  };
 
   componentDidMount() {
 
@@ -385,6 +371,20 @@ class SeafileEditor extends React.Component {
     this.props.onChange(change)
   }
 
+  onInsertImage = (url) => {
+    const change = this.props.value.change().insertInline({
+      type: 'image',
+      isVoid: true,
+      data: { src: url },
+    });
+    this.props.onChange(change);
+  }
+
+  toggleImageDialog = () => {
+    this.setState({
+      showAddImageDialog: !this.state.showAddImageDialog
+    });
+  }
 
   /**
    * Add image
@@ -393,6 +393,10 @@ class SeafileEditor extends React.Component {
    */
   onAddImage(event) {
     event.preventDefault()
+
+    this.toggleImageDialog();
+
+    /*
     const src = window.prompt('Enter the URL of the image:')
     if (!src) return
 
@@ -401,6 +405,7 @@ class SeafileEditor extends React.Component {
     const change = value.change().call(insertImage, src)
 
     this.props.onChange(change)
+    */
   }
 
   /**
@@ -581,26 +586,33 @@ class SeafileEditor extends React.Component {
     const onAddImage = event => this.onAddImage(event);
     return (
       <div className="menu toolbar-menu">
-      {this.renderMarkButton('BOLD', 'format_bold')}
-      {this.renderMarkButton('ITALIC', 'format_italic')}
-      {this.renderMarkButton('UNDERLINED', 'format_underlined')}
-      {this.renderBlockButton('header_one', 'looks_one')}
-      {this.renderBlockButton('header_two', 'looks_two')}
-      {this.renderBlockButton('block-quote', 'format_quote')}
-      {this.renderBlockButton('ol_list', 'format_list_numbered')}
-      {this.renderBlockButton('ul_list', 'format_list_bulleted')}
-      <span className="button" onMouseDown={onToggleCode} data-active="true">
+        {this.renderMarkButton('BOLD', 'format_bold')}
+        {this.renderMarkButton('ITALIC', 'format_italic')}
+        {this.renderMarkButton('UNDERLINED', 'format_underlined')}
+        {this.renderBlockButton('header_one', 'looks_one')}
+        {this.renderBlockButton('header_two', 'looks_two')}
+        {this.renderBlockButton('block-quote', 'format_quote')}
+        {this.renderBlockButton('ol_list', 'format_list_numbered')}
+        {this.renderBlockButton('ul_list', 'format_list_bulleted')}
+        <span className="button" onMouseDown={onToggleCode} data-active="true">
           <span className="material-icons">code</span>
-      </span>
-      <span className="button" onMouseDown={onAddTable} data-active="true">
+        </span>
+        <span className="button" onMouseDown={onAddTable} data-active="true">
           <span className="material-icons">grid_on</span>
-      </span>
-      <span className="button" onMouseDown={onAddImage} data-active="true">
+        </span>
+        <span className="button" onMouseDown={onAddImage} data-active="true">
           <span className="material-icons">image</span>
-      </span>
-      <span className="button" onMouseDown={onSave} data-active="true">
+        </span>
+        <span className="button" onMouseDown={onSave} data-active="true">
           <span className="material-icons">save</span>
-      </span>
+        </span>
+
+        <AddImageDialog
+          showAddImageDialog={this.state.showAddImageDialog}
+          toggleImageDialog={this.toggleImageDialog}
+          onInsertImage={this.onInsertImage}
+        />
+
       </div>
     )
   }

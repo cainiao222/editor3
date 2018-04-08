@@ -18,9 +18,9 @@ Release data: 2018.05.30
 * [-] Improve table
 * [x] Improve CSS
 * [x] Copy/paste image from clipboard
-* [] Change toolbar button icons
+* [-] Change toolbar button icons
 * Choose an image from Seafile
-* Support FILES
+* [] Support FILES
 
 ### Tree view
 
