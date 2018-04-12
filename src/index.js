@@ -16,8 +16,6 @@ import Tree from './tree-view/tree';
 import { Value } from 'slate';
 const { State } = require('markup-it');
 const markdown = require('markup-it/lib/markdown');
-
-
 const repoID = serverConfig.repoID;
 const filePath = "/test.md";
 const fileName = "test.md";
@@ -29,7 +27,6 @@ const state = State.create(markdown);
 const slate_document = state.deserializeToDocument('Hello *World*  **WORLD** _FOLD_ `block`\n## header3');
 const initialValue = Value.create({document: slate_document})
 
-
 function updateFile(uploadLink, filePath, fileName, content) {
   var formData = new FormData();
   formData.append("target_file", filePath);
@@ -40,8 +37,6 @@ function updateFile(uploadLink, filePath, fileName, content) {
   request.open("POST", uploadLink);
   request.send(formData);
 }
-
-
 
 function getImageFileNameWithTimestamp() {
   var d = Date.now();
@@ -58,7 +53,6 @@ class App extends React.Component {
 
   componentDidMount() {
     seafileAPI.login().then((response) => {
-
       seafileAPI.getFileDownloadLink(repoID, filePath).then((response) => {
         const url = response.data;
         fetch(url).then(function(response) {
@@ -73,9 +67,7 @@ class App extends React.Component {
         })
       })
 
-
       seafileAPI.listDir(repoID, dirPath).then((response) => {
-        console.log(response.data);
         // load the files and folder at the root of the library
         var children = response.data.map((item) => {
           return {
@@ -135,18 +127,15 @@ class App extends React.Component {
       treeData: treeData
     })
     */
-
   }
 
   onChange = ({ value }) => {
-    this.setState({ value })
+    this.setState({ value });
   }
 
   onSave = (event) => {
-    const { value } = this.state
-    console.log(value)
-    const str = state.serializeDocument(value.document)
-    //console.log(str);
+    const { value } = this.state;
+    const str = state.serializeDocument(value.document);
     seafileAPI.getUpdateLink(repoID, "/").then((response) => {
       updateFile(response.data, filePath, fileName, str)
     })
@@ -159,7 +148,6 @@ class App extends React.Component {
   uploadImage = (imageFile) => {
     return seafileAPI.getUploadLink(repoID, "/").then((response) => {
       const uploadLink = response.data + "?ret-json=1";
-      console.log(uploadLink);
       // change image file name
       var name = getImageFileNameWithTimestamp();
       var blob = imageFile.slice(0, -1, 'image/png');
@@ -178,7 +166,6 @@ class App extends React.Component {
     }).then((json) => {
       // The returned json is a list of uploaded files, need to get the first one
       var filename = json[0].name;
-      console.log(filename);
       return this.getImageURL(filename);
     });
   }

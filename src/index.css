@@ -1,3 +1,8 @@
+* {
+    margin: 0;
+    padding: 0;
+}
+/**editor style */
 html body{
   height: 100%;
 }
@@ -55,15 +60,6 @@ blockquote[dir='rtl'] {
   border-right: 2px solid #ddd;
 }
 
-table {
-  border-collapse: collapse;
-}
-
-td {
-  padding: 10px;
-  border: 2px solid #ddd;
-}
-
 input {
   box-sizing: border-box;
   font-size: 0.85em;
@@ -92,7 +88,7 @@ input:focus {
 }
 
 .menu > * + * {
-  margin-left: 15px;
+  margin-left: 10px;
 }
 
 .button {
@@ -101,7 +97,7 @@ input:focus {
 }
 
 .button[data-active='true'] {
-  color: black;
+  color: #000;
 }
 
 /**** article ****/
@@ -164,19 +160,24 @@ input:focus {
     margin:0;
     border:none;
 }
+
 .article a {
     font-weight:normal;
 }
+
 .article blockquote {
     color: #777;
     padding: 0 15px;
     border-left: 4px solid #DDD;
     margin: 1.2em 0;
 }
+
 .article table {
-    table-layout:auto;
-    width:auto;
-    margin:0.8em 0;
+    width: 100%;
+    border-collapse: collapse;
+    border-left: 1px solid #ddd;
+    border-top: 1px solid #ddd;
+    margin: 10px 0;
 }
 .article tr:nth-child(2n) {
     background-color: #F8F8F8;
@@ -184,10 +185,23 @@ input:focus {
 .article th,
 .article td {
     padding:6px 13px;
-    border:1px solid #ccc;
 }
 
-/*******add layout ***/
+.article table tr {
+    display: flex;
+}
+
+.article table td {
+    flex: 1;
+    padding: 10px;
+    border-width: 0 1px 1px 0;
+    border-style: solid;
+    border-color: #ccc;
+    word-break: break-all;
+}
+/*******editor style*/
+
+/*******add layout***/
 
 .textContainer {
   width: 100%;
@@ -210,22 +224,82 @@ input:focus {
   border-bottom: 1px solid #e5e5e5;
   box-shadow: 0 3px 2px -2px rgba(200,200,200,.15);
   z-index: 2;
+  user-select: none;
 }
 
+/*topbar style*/
+
+.menu div button {
+    background-color: #fff;
+    width: 30px;
+    heihgt:30px;
+    color: rgb(107,113,104);
+    border: none;
+    border-bottom:1px solid #cccfd6;
+    border-top:1px solid #cccfd6;
+    border-right:1px solid #cccfd6;
+}
+
+.menu div button:first-child {
+    border-left:1px solid #cccfd6;
+    border-radius: 2px 0 0 2px;
+}
+
+.menu div button:last-child {
+    border-right:1px solid #cccfd6;
+    border-radius:0 2px 2px 0;
+}
+
+.menu div button:only-child {
+    border-radius: 2px;
+    border:1px solid #cccfd6;
+}
+
+.menu button:hover {
+    background-color:rgb(247,247,247);
+}
+
+.tableToolBar {
+    font-size: 12px;
+}
+
+.tableToolBar div button {
+    width: auto;
+    padding:0 7px;
+    font-weight: 600;
+    height: 26px;
+}
+
+.tableToolBar div .symbol {
+    font-size: 14px;
+}
+
+.tableToolBar:after {
+    content: '';
+    display: block;
+    clear: both;
+}
+
+.tableToolBar div:not(first) {
+    display: inline-block;
+    margin-left:10px;
+}
+/*topbar style*/
 .title {
   float: left;
+  width:128px;
 }
 
 .menu {
-  float: right;
+  display: inline-block;
   margin-right: 20px;
+  float: right;
 }
 
 .container-fluid {
   position: relative;
   height: 100%;
   background-color: rgb(250,250,249);
-
 }
 
 .editor {

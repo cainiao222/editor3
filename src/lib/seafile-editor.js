@@ -9,17 +9,14 @@ import FileTree from './file-tree';
 import { Image } from './image';
 import { Inline } from 'slate';
 import AddImageDialog from './add-image-dialog';
-
+import { MarkButton,HeaderButton,BlockButton,CodeButton,ImageButton,SaveButton,TableToolBar } from "./topbarcomponent/editorToolBar";
 const DEFAULT_NODE = 'paragraph';
-
-
 const editCode = EditCode();
 const editTable = EditTable();
 const editList = EditList();
 
 /*
   When an image is pasted or dropped, insertImage() will be called.
-
   insertImage creates an image node with `file` stored in `data`.
 */
 const insertImages = InsertImages({
@@ -103,10 +100,8 @@ function MyPlugin(options) {
       switch (event.key) {
       case 'Enter':
         return this.onEnter(event, change)
-
       }
     }
-
   }
 }
 
@@ -262,10 +257,6 @@ class SeafileEditor extends React.Component {
     */
   }
 
-
-
-
-
   /**
   * When a mark button is clicked, toggle the current mark.
   *
@@ -291,12 +282,10 @@ class SeafileEditor extends React.Component {
     const value = this.props.value;
     const change = value.change()
     const { document } = value
-
     // Handle everything but list buttons.
     if (type !== 'ol_list' && type !== 'ul_list') {
-      const isActive = this.hasBlock(type)
-      const isList = this.hasBlock('list_item')
-
+      const isActive = this.hasBlock(type);
+      const isList = this.hasBlock('list_item');
       if (isList) {
         change
         .setBlocks(isActive ? DEFAULT_NODE : type)
@@ -310,7 +299,7 @@ class SeafileEditor extends React.Component {
       const isList = this.hasBlock('list_item')
       const isType = value.blocks.some(block => {
         return !!document.getClosest(block.key, parent => parent.type === type)
-      })
+      });
 
       if (isList && isType) {
         change
@@ -336,7 +325,7 @@ class SeafileEditor extends React.Component {
    *
    * @param {Event} event
    */
-  onToggleCode(event) {
+  onToggleCode = (event) => {
     event.preventDefault()
     const value = this.props.value
     const { selection } = value
@@ -391,7 +380,7 @@ class SeafileEditor extends React.Component {
    *
    * @param {Event} event
    */
-  onAddImage(event) {
+  onAddImage = (event) => {
     event.preventDefault()
 
     this.toggleImageDialog();
@@ -399,7 +388,6 @@ class SeafileEditor extends React.Component {
     /*
     const src = window.prompt('Enter the URL of the image:')
     if (!src) return
-
 
     const { value } = this.state
     const change = value.change().call(insertImage, src)
@@ -542,11 +530,13 @@ class SeafileEditor extends React.Component {
   }
 
   render() {
+    const  value  = this.props.value;
+    const isInTable = editTable.utils.isSelectionInTable(value);
     return (
       <div className='textContainer'>
-        <div className="topbar ">
-          <div className="title">SeafileEditor</div>
-            {this.renderToolbar()}
+        <div className="topbar">
+          <div className="title"><img src={ require('../assets/seafile-logo.png') } alt=""/></div>
+            { this.renderToolbar(isInTable) }
         </div>
         <div className="container-fluid">
           <div className="row">
@@ -578,57 +568,89 @@ class SeafileEditor extends React.Component {
     )
   }
 
-  renderToolbar = () => {
-
-    const onSave = event => this.onSave(event);
-    const onToggleCode = event => this.onToggleCode(event);
-    const onAddTable = event => this.onAddTable(event);
-    const onAddImage = event => this.onAddImage(event);
+  renderToolbar = (isNormal) => {
     return (
       <div className="menu toolbar-menu">
-        {this.renderMarkButton('BOLD', 'format_bold')}
-        {this.renderMarkButton('ITALIC', 'format_italic')}
-        {this.renderMarkButton('UNDERLINED', 'format_underlined')}
-        {this.renderBlockButton('header_one', 'looks_one')}
-        {this.renderBlockButton('header_two', 'looks_two')}
-        {this.renderBlockButton('block-quote', 'format_quote')}
-        {this.renderBlockButton('ol_list', 'format_list_numbered')}
-        {this.renderBlockButton('ul_list', 'format_list_bulleted')}
-        <span className="button" onMouseDown={onToggleCode} data-active="true">
-          <span className="material-icons">code</span>
-        </span>
-        <span className="button" onMouseDown={onAddTable} data-active="true">
-          <span className="material-icons">grid_on</span>
-        </span>
-        <span className="button" onMouseDown={onAddImage} data-active="true">
-          <span className="material-icons">image</span>
-        </span>
-        <span className="button" onMouseDown={onSave} data-active="true">
-          <span className="material-icons">save</span>
-        </span>
-
+        <MarkButton renderMarkButton={this.renderMarkButton}/>
+        <HeaderButton renderBlockButton={this.renderBlockButton}/>
+        <BlockButton renderBlockButton={this.renderBlockButton}/>
+        <CodeButton onToggleCode={this.onToggleCode}/>
+        {isNormal?this.renderTableToolbar():this.renderNormalTableBar()}
+        <ImageButton onAddImage={this.onAddImage}/>
+        <SaveButton onSave={this.onSave}/>
         <AddImageDialog
           showAddImageDialog={this.state.showAddImageDialog}
           toggleImageDialog={this.toggleImageDialog}
           onInsertImage={this.onInsertImage}
         />
-
       </div>
     )
   }
 
+  renderNormalTableBar= () => {
+    const onAddTable = event => this.onAddTable(event);
+    return(
+      <div className={'TableButton'}>
+        <button className={"button"} onMouseDown={onAddTable} data-active="true">
+          <span className={"material-icons"}>grid_on</span>
+        </button>
+      </div>
+    )
+  };
+
+  renderTableToolbar = () => {
+    return (
+      <TableToolBar
+        onRemoveTable={this.onRemoveTable}
+        onInsertColumn={this.onInsertColumn}
+        onRemoveColumn={this.onRemoveColumn}
+        onInsertRow={this.onInsertRow}
+        onRemoveRow={this.onRemoveRow}
+        onSetAlign={this.onSetAlign}
+      />
+    )
+  }
+
+  onInsertColumn = event => {
+    event.preventDefault();
+    this.props.onChange(editTable.changes.insertColumn(this.props.value.change()))
+  };
+
+  onInsertRow = event => {
+    event.preventDefault();
+    this.props.onChange(editTable.changes.insertRow(this.props.value.change()));
+  };
+
+  onRemoveColumn = event => {
+    event.preventDefault();
+    this.props.onChange(editTable.changes.removeColumn(this.props.value.change()));
+  };
+
+  onRemoveRow = event => {
+    event.preventDefault();
+    this.props.onChange( editTable.changes.removeRow(this.props.value.change()));
+  };
+
+  onRemoveTable = event => {
+    event.preventDefault();
+    this.props.onChange( editTable.changes.removeTable(this.props.value.change()));
+  };
+
+  onSetAlign = (event, align) => {
+    event.preventDefault();
+    this.props.onChange(editTable.changes.setColumnAlign(this.props.value.change(),align));
+  };
 
   renderMarkButton = (type, icon) => {
     const isActive = this.hasMark(type);
     const onMouseDown = event => this.onClickMark(event, type);
     return (
       // eslint-disable-next-line react/jsx-no-bind
-      <span className="button" onMouseDown={onMouseDown} data-active={isActive}>
+      <button className="button" onMouseDown={onMouseDown} data-active={isActive}>
         <span className="material-icons">{icon}</span>
-      </span>
+      </button>
     )
   }
-
 
   /**
   * Render a block-toggling toolbar button.
@@ -640,12 +662,11 @@ class SeafileEditor extends React.Component {
   renderBlockButton = (type, icon) => {
     const isActive = this.hasBlock(type);
     const onMouseDown = event => this.onClickBlock(event, type);
-
     return (
       // eslint-disable-next-line react/jsx-no-bind
-      <span className="button" onMouseDown={onMouseDown} data-active={isActive}>
-        <span className="material-icons">{icon}</span>
-      </span>
+      <button className={"button"} onMouseDown={onMouseDown} data-active={isActive}>
+        <span className={"material-icons"}>{icon}</span>
+      </button>
     )
   }
 }
