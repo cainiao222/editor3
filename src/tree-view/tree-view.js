@@ -40,7 +40,7 @@ class TreeView extends React.Component {
     }
 
     return (
-      <div className="tree">
+      <div className="tree-view tree">
         <TreeNodeView
           tree={tree}
           node={tree.root}

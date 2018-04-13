@@ -5,11 +5,9 @@ class FileTree extends React.Component {
 
   render() {
     return (
-      <div className='treeContainer'>
-        <TreeView
-          tree={this.props.treeData}
-        />
-      </div>
+      <TreeView
+        tree={this.props.treeData}
+      />
     )
   }
 

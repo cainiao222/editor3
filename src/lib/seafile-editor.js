@@ -533,22 +533,22 @@ class SeafileEditor extends React.Component {
     const  value  = this.props.value;
     const isInTable = editTable.utils.isSelectionInTable(value);
     return (
-      <div className='textContainer'>
-        <div className="topbar">
+      <div className='seafile-editor'>
+        <div className="seafile-editor-topbar">
           <div className="title"><img src={ require('../assets/seafile-logo.png') } alt=""/></div>
             { this.renderToolbar(isInTable) }
         </div>
-        <div className="container-fluid">
-          <div className="row">
-            <div className="left-panel">
+        <div className="seafile-editor-main row">
+            <div className="seafile-editor-left-panel col-3">
               <FileTree
                 treeData={this.props.treeData}
                 isLoaded={this.props.isTreeDataLoaded}
                 onChange={this.props.onTreeChange}
               />
             </div>
-            <div className="editorContainer">
-              <div className="editor article right-panel">
+            <div className="seafile-editor-right-panel col-9">
+              <div className="editor-container">
+              <div className="editor article">
                 <Editor
                     value={this.props.value}
                     plugins={plugins}
@@ -561,7 +561,7 @@ class SeafileEditor extends React.Component {
                     getImageURL={this.props.getImageURL}
                 />
               </div>
-            </div>
+              </div>
           </div>
         </div>
       </div>

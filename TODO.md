@@ -15,16 +15,21 @@ Release data: 2018.05.30
 
 ## Version beta 2
 
-* [-] Improve table
+* [x] Improve table
 * [x] Improve CSS
 * [x] Copy/paste image from clipboard
 * [-] Change toolbar button icons
-* Choose an image from Seafile
-* [] Support FILES
 
 ### Tree view
 
 * [] Folder/File icons
+* [] Click and show content
+* [] Drag and create link
+* [] Add file
+
+## Version beta 3
+
+* Switch to plain markdown editor
 
 
 ## Future versions
@@ -36,7 +41,6 @@ Not important
 
 * Support task list
 * Support quotation
-* Improve Icons
 
 Integrating into Seafile
 

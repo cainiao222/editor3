@@ -178,18 +178,16 @@ class App extends React.Component {
 
   render() {
     return (
-      <div className="EditorDemo">
-        <SeafileEditor
-          value={this.state.value}
-          onChange={this.onChange}
-          onSave={this.onSave}
-          treeData={this.state.treeData}
-          isTreeDataLoaded={this.state.isTreeDataLoaded}
-          onTreeChange={this.onTreeChange}
-          uploadImage={this.uploadImage}
-          getImageURL={this.getImageURL}
-        />
-      </div>
+      <SeafileEditor
+        value={this.state.value}
+        onChange={this.onChange}
+        onSave={this.onSave}
+        treeData={this.state.treeData}
+        isTreeDataLoaded={this.state.isTreeDataLoaded}
+        onTreeChange={this.onTreeChange}
+        uploadImage={this.uploadImage}
+        getImageURL={this.getImageURL}
+      />
     )
   }
 
