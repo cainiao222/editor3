@@ -18,14 +18,15 @@ Release data: 2018.05.30
 * [x] Improve table
 * [x] Improve CSS
 * [x] Copy/paste image from clipboard
+* [-] Improve code block
 * [-] Change toolbar button icons
+* [-] Support task list
 
 ### Tree view
 
-* [] Folder/File icons
-* [] Click and show content
-* [] Drag and create link
-* [] Add file
+* [-] Folder/File icons
+* [-] Click and show content
+* [-] Drag and create link
 
 ## Version beta 3
 
@@ -35,16 +36,18 @@ Release data: 2018.05.30
 ## Future versions
 
 
-* Improve code block
-
 Not important
 
-* Support task list
 * Support quotation
 
 Integrating into Seafile
 
 * Support TOC
+
+### Tree view
+
+* [] Add file
+
 
 
 ### Plain react markdown editor

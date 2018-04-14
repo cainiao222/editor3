@@ -401,7 +401,7 @@ class SeafileEditor extends React.Component {
    *
    * @param {Event} event
    */
-  onSave(event) {
+  onSave = (event) => {
     this.props.onSave(event)
   }
      
