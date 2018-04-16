@@ -4,70 +4,70 @@
 }
 /**editor style */
 html body{
-    height: 100%;
+  height: 100%;
 }
 
 html,
 input,
 textarea {
-    font-family: 'Roboto', sans-serif;
-    line-height: 1.4;
-    background: #eee;
+  font-family: 'Roboto', sans-serif;
+  line-height: 1.4;
+  background: #eee;
 }
 
 body {
-    margin: 0;
-    overflow-y: hidden;
+  margin: 0;
+  overflow-y: hidden;
 }
 
 p {
-    margin: 0;
+  margin: 0;
 }
 
 pre {
-    padding: 10px;
-    background-color: #eee;
-    white-space: pre-wrap;
+  padding: 10px;
+  background-color: #eee;
+  white-space: pre-wrap;
 }
 
 :not(pre) > code {
-    font-family: monospace;
-    background-color: #eee;
-    padding: 3px;
+  font-family: monospace;
+  background-color: #eee;
+  padding: 3px;
 }
 
 img {
-    max-width: 100%;
-    max-height: 20em;
+  max-width: 100%;
+  max-height: 20em;
 }
 
 img.active {
-    box-shadow: 0 0 0 2px blue;
+  box-shadow: 0 0 0 2px blue;
 }
 
 blockquote {
-    border-left: 2px solid #ddd;
-    margin-left: 0;
-    margin-right: 0;
-    padding-left: 10px;
-    color: #aaa;
-    font-style: italic;
+  border-left: 2px solid #ddd;
+  margin-left: 0;
+  margin-right: 0;
+  padding-left: 10px;
+  color: #aaa;
+  font-style: italic;
 }
 
 blockquote[dir='rtl'] {
-    border-left: none;
-    padding-left: 0;
-    padding-right: 10px;
-    border-right: 2px solid #ddd;
+  border-left: none;
+  padding-left: 0;
+  padding-right: 10px;
+  border-right: 2px solid #ddd;
 }
 
 input {
-    box-sizing: border-box;
-    font-size: 0.85em;
-    width: 100%;
-    padding: 0.5em;
-    border: 2px solid #ddd;
-    background: #fafafa;
+  box-sizing: border-box;
+  font-size: 0.85em;
+  width: 100%;
+  padding: 0.5em;
+  border: 2px solid #ddd;
+  background: #fafafa;
 }
 
 input:focus {
@@ -80,53 +80,52 @@ input:focus {
  */
 
 .material-icons {
-    font-size: 18px;
-    vertical-align: text-bottom;
-}
+  font-size: 18px;
+  vertical-align: text-bottom;}
 
 .menu > * {
-    display: inline-block;
+  display: inline-block;
 }
 
 .menu > * + * {
-    margin-left: 10px;
+  margin-left: 10px;
 }
 
 .btn-active {
-    color: #0c0c0c;
-    cursor: pointer;
+  color: #0c0c0c;
+  cursor: pointer;
 }
 
 .btn-active[data-active='true'] {
-    color: blue;
+  color: blue;
 }
 
 /******* layout ***/
 .seafile-editor {
-    /*
-      reference: https://developer.mozilla.org/en-US/docs/Web/CSS/Containing_block
-      using `position: fixed` to make eafile-editor's containing block
-      the initial containing block (on screens, the viewport).
-      Thus, the editor's dimensions change based on the size of the browser window.
-    */
-    position: fixed;
-    width: 100%;
-    height: 100%;
-    min-width: 1300px;
+  /*
+    reference: https://developer.mozilla.org/en-US/docs/Web/CSS/Containing_block
+    using `position: fixed` to make eafile-editor's containing block
+    the initial containing block (on screens, the viewport).
+    Thus, the editor's dimensions change based on the size of the browser window.
+  */
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  min-width: 1300px;
 }
 
 .seafile-editor-topbar {
-    width: 100%;
-    height: 68px;
-    background-color: #fff;
-    padding: 18px 10px;
-    border-bottom: 1px solid #e5e5e5;
-    box-shadow: 0 3px 2px -2px rgba(200,200,200,.15);
-    user-select: none;
+  width: 100%;
+  height: 68px;
+  background-color: #fff;
+  padding: 18px 10px;
+  border-bottom: 1px solid #e5e5e5;
+  box-shadow: 0 3px 2px -2px rgba(200,200,200,.15);
+  user-select: none;
 }
 
 .seafile-editor-main {
-    height: calc(100% - 68px);
+  height: calc(100% - 68px);
 }
 
 
@@ -139,39 +138,39 @@ input:focus {
 */
 
 .seafile-editor-left-panel {
-    height: 100%;
-    background-color: #fff;
-    border-right: 1px solid rgb(230,230,221);
-    overflow: scroll;
+  height: 100%;
+  background-color: #fff;
+  border-right: 1px solid rgb(230,230,221);
+  overflow: scroll;
 }
 
 .tree-view {
 }
 
 .seafile-editor-right-panel {
-    height: 100%;
-    background-color: rgb(250,250,249);
-    overflow-x: hidden;
+  height: 100%;
+  background-color: rgb(250,250,249);
+  overflow-x: hidden;
 }
 
 .editor-container {
-    /* this container is needed to show the scroll bar */
-    height: 100%;
-    overflow-y: scroll;
+  /* this container is needed to show the scroll bar */
+  height: 100%;
+  overflow-y: scroll;
 }
 
 .editor {
-    min-height: calc(100% - 40px);
-    background: #fff;
-    padding:30px 30px 15px;
-    margin: 20px 40px;
-    border: 1px solid rgb(230,230,221);
+  min-height: calc(100% - 40px);
+  background: #fff;
+  padding:30px 30px 15px;
+  margin: 20px 40px;
+  border: 1px solid rgb(230,230,221);
 }
 
 /*topbar style*/
 
 .tableToolBar {
-    font-size: 12px;
+  font-size: 12px;
 }
 
 .tableToolBar div .symbol {
@@ -191,35 +190,35 @@ input:focus {
 
 /*topbar style*/
 .title {
-    float: left;
-    width:128px;
+  float: left;
+  width:128px;
 }
 
 .menu {
-    display: inline-block;
-    margin-right: 20px;
-    float: right;
+  display: inline-block;
+  margin-right: 20px;
+  float: right;
 }
 
 /* tree view */
 .tree-node-inner {
-    position: relative;
-    padding-left: 12px;
+  position: relative;
+  padding-left: 12px;
 }
 .tree-node .collapse-node {
-    position: absolute;
-    left: 0;
-    top: -6px;
-    cursor: pointer;
+  position: absolute;
+  left: 0;
+  top: -6px;
+  cursor: pointer;
 }
 .tree-node .caret-right, .tree-node .caret-down {
-    font-size: 24px;
+  font-size: 24px;
 }
 .tree-node .caret-right:before {
-    content: '\25B8';
+  content: '\25B8';
 }
 .tree-node .caret-down:before {
-    content: '\25BE';
+  content: '\25BE';
 }
 
 /**** article ****/
@@ -314,10 +313,10 @@ input:focus {
 }
 
 .article table td {
-    flex: 1;
-    padding: 10px;
-    border-width: 0 1px 1px 0;
-    border-style: solid;
-    border-color: #ccc;
-    word-break: break-all;
+  flex: 1;
+  padding: 10px;
+  border-width: 0 1px 1px 0;
+  border-style: solid;
+  border-color: #ccc;
+  word-break: break-all;
 }

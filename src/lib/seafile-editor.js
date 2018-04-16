@@ -143,8 +143,8 @@ class SeafileEditor extends React.Component {
    */
 
   hasBlock = type => {
-    const value = this.props.value;
-    return value.blocks.some( node => node.type === type);
+    const value = this.props.value
+    return value.blocks.some( node => node.type === type)
   }
 
   /**
@@ -278,7 +278,7 @@ class SeafileEditor extends React.Component {
    * @param {String} type
    */
   onClickBlock = (event, type) => {
-    event.preventDefault();
+    event.preventDefault()
     const value = this.props.value;
     const change = value.change()
     const { document } = value
@@ -313,7 +313,7 @@ class SeafileEditor extends React.Component {
         )
         .wrapBlock(type)
       } else {
-        change.setBlocks(DEFAULT_NODE).wrapBlock(type)
+        change.setBlocks('list_item').wrapBlock(type)
       }
     }
 
