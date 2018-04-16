@@ -9,7 +9,7 @@ import FileTree from './file-tree';
 import { Image } from './image';
 import { Inline } from 'slate';
 import AddImageDialog from './add-image-dialog';
-import { MarkButton, HeaderButton, BlockButton, CodeButton, ImageButton, SaveButton, TableToolBar, Button } from "./topbarcomponent/editorToolBar";
+import { MarkButton, HeaderButton, BlockButton, CodeButton, ImageButton, SaveButton, TableToolBar, Button, ButtonContainer } from "./topbarcomponent/editorToolBar";
 const DEFAULT_NODE = 'paragraph';
 const editCode = EditCode();
 const editTable = EditTable();
@@ -603,11 +603,9 @@ class SeafileEditor extends React.Component {
   renderNormalTableBar= () => {
     const onAddTable = event => this.onAddTable(event);
     return(
-      <div className={"btn-group"} role={"group"}>
-        <button type={"button"} className={"btn btn-secondary"} onMouseDown={onAddTable}>
-          <i className={"fe fe-grid"}></i>
-        </button>
-      </div>
+      <ButtonContainer>
+        <Button type={'grid_on'} onMouseDown={onAddTable}/>
+      </ButtonContainer>
     )
   };
 
