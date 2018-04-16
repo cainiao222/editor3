@@ -9,7 +9,7 @@ import FileTree from './file-tree';
 import { Image } from './image';
 import { Inline } from 'slate';
 import AddImageDialog from './add-image-dialog';
-import { MarkButton, HeaderButton, BlockButton, CodeButton, ImageButton, SaveButton, TableToolBar, Button, ButtonContainer } from "./topbarcomponent/editorToolBar";
+import { MarkButton, HeaderButton, BlockButton, CodeButton, ImageButton, SaveButton, TableToolBar, Button } from "./topbarcomponent/editorToolBar";
 const DEFAULT_NODE = 'paragraph';
 const editCode = EditCode();
 const editTable = EditTable();
@@ -143,8 +143,8 @@ class SeafileEditor extends React.Component {
    */
 
   hasBlock = type => {
-    const value = this.props.value
-    return value.blocks.some( node => node.type === type)
+    const value = this.props.value;
+    return value.blocks.some( node => node.type === type);
   }
 
   /**
@@ -278,7 +278,7 @@ class SeafileEditor extends React.Component {
    * @param {String} type
    */
   onClickBlock = (event, type) => {
-    event.preventDefault()
+    event.preventDefault();
     const value = this.props.value;
     const change = value.change()
     const { document } = value
@@ -313,7 +313,7 @@ class SeafileEditor extends React.Component {
         )
         .wrapBlock(type)
       } else {
-        change.setBlocks('list_item').wrapBlock(type)
+        change.setBlocks(DEFAULT_NODE).wrapBlock(type)
       }
     }
 
