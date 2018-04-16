@@ -1,12 +1,13 @@
 // Import React!
+
 import React from 'react';
 import ReactDOM from 'react-dom';
 import { SeafileEditor } from './lib/seafile-editor';
 import HTML5Backend from 'react-dnd-html5-backend';
 import { DragDropContext } from 'react-dnd';
-
-import './css/seafile-ui.css'
+import './css/font.css'
 import './index.css';
+import './css/seafile-ui.css'
 
 
 import { serverConfig } from './config'
@@ -65,12 +66,12 @@ class App extends React.Component {
           const value = Value.create({document: document})
           this.setState({
             value: value,
+            isSelectedImage:false
           })
         })
       })
 
       seafileAPI.listDir(repoID, dirPath).then((response) => {
-        // load the files and folder at the root of the library
         var children = response.data.map((item) => {
           return {
             name: item.name,
@@ -93,9 +94,7 @@ class App extends React.Component {
           isTreeDataLoaded: true,
           treeData: treeData
         })
-
       })
-
     })
 
     // for testing
@@ -174,7 +173,6 @@ class App extends React.Component {
 
   getImageURL = (fileName) => {
     var url = serverConfig.server + "/lib/" + repoID + "/file/images/" + fileName + "?raw=1";
-    console.log(url);
     return url;
   }
 

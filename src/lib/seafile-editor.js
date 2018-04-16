@@ -9,12 +9,11 @@ import FileTree from './file-tree';
 import { Image } from './image';
 import { Inline } from 'slate';
 import AddImageDialog from './add-image-dialog';
-import { MarkButton,HeaderButton,BlockButton,CodeButton,ImageButton,SaveButton,TableToolBar } from "./topbarcomponent/editorToolBar";
+import { MarkButton, HeaderButton, BlockButton, CodeButton, ImageButton, SaveButton, TableToolBar, Button } from "./topbarcomponent/editorToolBar";
 const DEFAULT_NODE = 'paragraph';
 const editCode = EditCode();
 const editTable = EditTable();
 const editList = EditList();
-
 /*
   When an image is pasted or dropped, insertImage() will be called.
   insertImage creates an image node with `file` stored in `data`.
@@ -98,8 +97,8 @@ function MyPlugin(options) {
 
     onKeyDown(event, change, editor) {
       switch (event.key) {
-      case 'Enter':
-        return this.onEnter(event, change)
+        case 'Enter':
+          return this.onEnter(event, change)
       }
     }
   }
@@ -117,7 +116,8 @@ const plugins = [
 class SeafileEditor extends React.Component {
 
   state = {
-      showAddImageDialog: false
+      showAddImageDialog: false,
+      isSelectedImage:false
   };
 
   componentDidMount() {
@@ -144,7 +144,7 @@ class SeafileEditor extends React.Component {
 
   hasBlock = type => {
     const value = this.props.value
-    return value.blocks.some(node => node.type === type)
+    return value.blocks.some( node => node.type === type)
   }
 
   /**
@@ -336,7 +336,8 @@ class SeafileEditor extends React.Component {
     } else {
       change.toggleMark('CODE')
     }
-    this.props.onChange(change)
+
+    this.props.onChange(editCode.changes.toggleCodeBlock(change))
   }
 
   /**
@@ -418,7 +419,6 @@ class SeafileEditor extends React.Component {
     */
     const { attributes, children, node, isSelected } = props
     let textAlign;
-
     switch (node.type) {
       case 'block-quote':
         return <blockquote {...attributes}>{children}</blockquote>
@@ -441,7 +441,7 @@ class SeafileEditor extends React.Component {
       case 'ol_list':
         return <ol {...attributes}>{children}</ol>
       case 'image':
-        return <Image {...props} />
+        return <Image {...props}/>
       case 'image2':
         return <Image {...props} />
       case 'code_block':
@@ -529,14 +529,26 @@ class SeafileEditor extends React.Component {
     }
   }
 
+  hasSelectImage (value) {
+    /*
+    * get image obj when selected,has not found a better way
+    * */
+    let imageObj=value.inlines.toJSON()[0];
+    if(imageObj&&imageObj.type==='image') {
+      return true
+    }
+    return false
+  }
+
   render() {
     const  value  = this.props.value;
     const isInTable = editTable.utils.isSelectionInTable(value);
+    const activeImage=this.hasSelectImage(value);
     return (
       <div className='seafile-editor'>
         <div className="seafile-editor-topbar">
           <div className="title"><img src={ require('../assets/seafile-logo.png') } alt=""/></div>
-            { this.renderToolbar(isInTable) }
+            { this.renderToolbar(isInTable,activeImage) }
         </div>
         <div className="seafile-editor-main row">
             <div className="seafile-editor-left-panel col-3">
@@ -568,15 +580,16 @@ class SeafileEditor extends React.Component {
     )
   }
 
-  renderToolbar = (isNormal) => {
+  renderToolbar = (isInTable,activeImage) => {
+    const isCodeActive=editCode.utils.isInCodeBlock(this.props.value);
     return (
       <div className="menu toolbar-menu">
         <MarkButton renderMarkButton={this.renderMarkButton}/>
         <HeaderButton renderBlockButton={this.renderBlockButton}/>
-        <BlockButton renderBlockButton={this.renderBlockButton}/>
-        <CodeButton onToggleCode={this.onToggleCode}/>
-        {isNormal?this.renderTableToolbar():this.renderNormalTableBar()}
-        <ImageButton onAddImage={this.onAddImage}/>
+        <BlockButton renderBlockButton={this.renderBlockButton} renderListButton={this.renderListButton}/>
+        <CodeButton isCodeActive={isCodeActive} onToggleCode={this.onToggleCode}/>
+        {isInTable?this.renderTableToolbar():this.renderNormalTableBar()}
+        <ImageButton isImageActive={activeImage}  onAddImage={this.onAddImage}/>
         <SaveButton onSave={this.onSave}/>
         <AddImageDialog
           showAddImageDialog={this.state.showAddImageDialog}
@@ -590,9 +603,9 @@ class SeafileEditor extends React.Component {
   renderNormalTableBar= () => {
     const onAddTable = event => this.onAddTable(event);
     return(
-      <div className={'TableButton'}>
-        <button className={"button"} onMouseDown={onAddTable} data-active="true">
-          <span className={"material-icons"}>grid_on</span>
+      <div className={"btn-group"} role={"group"}>
+        <button type={"button"} className={"btn btn-secondary"} onMouseDown={onAddTable}>
+          <i className={"fe fe-grid"}></i>
         </button>
       </div>
     )
@@ -646,9 +659,7 @@ class SeafileEditor extends React.Component {
     const onMouseDown = event => this.onClickMark(event, type);
     return (
       // eslint-disable-next-line react/jsx-no-bind
-      <button className="button" onMouseDown={onMouseDown} data-active={isActive}>
-        <span className="material-icons">{icon}</span>
-      </button>
+      <Button onMouseDown={onMouseDown} isActive={isActive} type={icon}></Button>
     )
   }
 
@@ -664,11 +675,10 @@ class SeafileEditor extends React.Component {
     const onMouseDown = event => this.onClickBlock(event, type);
     return (
       // eslint-disable-next-line react/jsx-no-bind
-      <button className={"button"} onMouseDown={onMouseDown} data-active={isActive}>
-        <span className={"material-icons"}>{icon}</span>
-      </button>
+      <Button onMouseDown={onMouseDown} isActive={isActive} type={icon}></Button>
     )
   }
+
 }
 
 export { SeafileEditor };

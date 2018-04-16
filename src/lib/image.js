@@ -9,7 +9,7 @@ class Image extends React.Component {
     const className = isSelected ? 'active' : null
     return src
       ? <img src={src} className={className} alt={node.data.get('')} />
-      : <span>Loading...</span>
+  : <span>Loading...</span>
   }
 
 }

@@ -1,6 +1,6 @@
 * {
-    margin: 0;
-    padding: 0;
+  margin: 0;
+  padding: 0;
 }
 /**editor style */
 html body{
@@ -71,8 +71,8 @@ input {
 }
 
 input:focus {
-  outline: 0;
-  border-color: blue;
+    outline: 0;
+    border-color: blue;
 }
 
 /**
@@ -81,8 +81,7 @@ input:focus {
 
 .material-icons {
   font-size: 18px;
-  vertical-align: text-bottom;
-}
+  vertical-align: text-bottom;}
 
 .menu > * {
   display: inline-block;
@@ -92,13 +91,13 @@ input:focus {
   margin-left: 10px;
 }
 
-.button {
-  color: #ccc;
+.btn-active {
+  color: #0c0c0c;
   cursor: pointer;
 }
 
-.button[data-active='true'] {
-  color: #000;
+.btn-active[data-active='true'] {
+  color: blue;
 }
 
 /******* layout ***/
@@ -112,6 +111,7 @@ input:focus {
   position: fixed;
   width: 100%;
   height: 100%;
+  min-width: 1300px;
 }
 
 .seafile-editor-topbar {
@@ -167,63 +167,25 @@ input:focus {
   border: 1px solid rgb(230,230,221);
 }
 
-
 /*topbar style*/
 
-.menu div button {
-    background-color: #fff;
-    width: 30px;
-    heihgt:30px;
-    color: rgb(107,113,104);
-    border: none;
-    border-bottom:1px solid #cccfd6;
-    border-top:1px solid #cccfd6;
-    border-right:1px solid #cccfd6;
-}
-
-.menu div button:first-child {
-    border-left:1px solid #cccfd6;
-    border-radius: 2px 0 0 2px;
-}
-
-.menu div button:last-child {
-    border-right:1px solid #cccfd6;
-    border-radius:0 2px 2px 0;
-}
-
-.menu div button:only-child {
-    border-radius: 2px;
-    border:1px solid #cccfd6;
-}
-
-.menu button:hover {
-    background-color:rgb(247,247,247);
-}
-
 .tableToolBar {
-    font-size: 12px;
-}
-
-.tableToolBar div button {
-    width: auto;
-    padding:0 7px;
-    font-weight: 600;
-    height: 26px;
+  font-size: 12px;
 }
 
 .tableToolBar div .symbol {
-    font-size: 14px;
+  font-size: 14px;
 }
 
 .tableToolBar:after {
-    content: '';
-    display: block;
-    clear: both;
+  content: '';
+  display: block;
+  clear: both;
 }
 
 .tableToolBar div:not(first) {
-    display: inline-block;
-    margin-left:10px;
+  display: inline-block;
+  margin-left:10px;
 }
 /*topbar style*/
 .title {
@@ -260,101 +222,100 @@ input:focus {
 
 /**** article ****/
 .article {
-    padding:40px 200px 40px 60px;
-    font-size:14px;
-    line-height:1.6;
-    color:#333;
+  padding:40px 200px 40px 60px;
+  font-size:14px;
+  line-height:1.6;
+  color:#333;
 }
 .article h2,
 .article h3,
 .article h4,
 .article h5,
 .article h6 {
-    margin: 1.2em 0 0.4em;
-    color:#333;
-    font-weight:bold;
+  margin: 1.2em 0 0.4em;
+  color:#333;
+  font-weight:bold;
 }
 .article h1 + p, .article h2 + p, .article h3 + p, .article h4 + p, .article h5 + p, .article h6 + p,
 .article h1 + pre, .article h2 + pre, .article h3 + pre, .article h4 + pre, .article h5 + pre, .article h6 + pre,
 .article h1 + ul, .article h2 + ul, .article h3 + ul, .article h4 + ul, .article h5 + ul, .article h6 + ul,
 .article h1 + ol, .article h2 + ol, .article h3 + ol, .article h4 + ol, .article h5 + ol, .article h6 + ol {
-    margin-top: 0;
+  margin-top: 0;
 }
 .article p {
-    margin:0.8em 0;
+  margin:0.8em 0;
 }
 .article ul {
-    list-style-type:disc;
+  list-style-type:disc;
 }
 .article ul,
 .article ol {
-    padding-left:2em;
-    margin:0.5em 0;
+  padding-left:2em;
+  margin:0.5em 0;
 }
 .article code {
-    font-size:12px;
-    white-space: pre-wrap;
-    padding: 1px 5px 0;
-    background-color: #F8F8F8;
-    border: 1px solid #dadada;
-    border-radius: 2px;
-    -moz-border-radius: 2px;
-    -webkit-border-radius: 2px;
-    margin: 0 2px;
+  font-size:12px;
+  white-space: pre-wrap;
+  padding: 1px 5px 0;
+  background-color: #F8F8F8;
+  border: 1px solid #dadada;
+  border-radius: 2px;
+  -moz-border-radius: 2px;
+  -webkit-border-radius: 2px;
+  margin: 0 2px;
 }
 .article pre {
-    font-size:13px;
-    padding:5px 10px;
-    background:#f8f8f8;
-    border:1px solid #ddd;
-    border-radius:3px;
-    -moz-border-radius:3px;
-    -webkit-border-radius:3px;
-    margin:1em 0;
+  font-size:13px;
+  padding:5px 10px;
+  background:#f8f8f8;
+  border:1px solid #ddd;
+  border-radius:3px;
+  -moz-border-radius:3px;
+  -webkit-border-radius:3px;
+  margin:1em 0;
 }
 .article pre code {
-    white-space:pre-wrap;
-    padding:0;
-    margin:0;
-    border:none;
+  white-space:pre-wrap;
+  padding:0;
+  margin:0;
+  border:none;
 }
 
 .article a {
-    font-weight:normal;
+  font-weight:normal;
 }
 
 .article blockquote {
-    color: #777;
-    padding: 0 15px;
-    border-left: 4px solid #DDD;
-    margin: 1.2em 0;
+  color: #777;
+  padding: 0 15px;
+  border-left: 4px solid #DDD;
+  margin: 1.2em 0;
 }
 
 .article table {
-    width: 100%;
-    border-collapse: collapse;
-    border-left: 1px solid #ddd;
-    border-top: 1px solid #ddd;
-    margin: 10px 0;
+  width: 100%;
+  border-collapse: collapse;
+  border-left: 1px solid #ddd;
+  border-top: 1px solid #ddd;
+  margin: 10px 0;
 }
 .article tr:nth-child(2n) {
-    background-color: #F8F8F8;
+  background-color: #F8F8F8;
 }
 .article th,
 .article td {
-    padding:6px 13px;
+  padding:6px 13px;
 }
 
 .article table tr {
-    display: flex;
+  display: flex;
 }
 
 .article table td {
-    flex: 1;
-    padding: 10px;
-    border-width: 0 1px 1px 0;
-    border-style: solid;
-    border-color: #ccc;
-    word-break: break-all;
+  flex: 1;
+  padding: 10px;
+  border-width: 0 1px 1px 0;
+  border-style: solid;
+  border-color: #ccc;
+  word-break: break-all;
 }
-/*******editor style*/
