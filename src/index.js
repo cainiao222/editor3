@@ -16,8 +16,9 @@ import 'whatwg-fetch'
 import Tree from './tree-view/tree';
 
 import { Value } from 'slate';
-const { State } = require('markup-it');
-const markdown = require('markup-it/lib/markdown');
+import { serialize, deserialize } from './slate2markdown';
+
+
 const repoID = serverConfig.repoID;
 const filePath = "/test.md";
 const fileName = "test.md";
@@ -25,9 +26,9 @@ const dirPath = "/"
 const seafileAPI = new SeafileAPI(serverConfig.server, serverConfig.username, serverConfig.password);
 
 // create initialValue
-const state = State.create(markdown);
-const slate_document = state.deserializeToDocument('Hello *World*  **WORLD** _FOLD_ `block`\n## header3');
-const initialValue = Value.create({document: slate_document})
+
+const initialValue = deserialize('Hello *World*  **WORLD** _FOLD_ `block`\n## header3');
+
 
 function updateFile(uploadLink, filePath, fileName, content) {
   var formData = new FormData();
@@ -55,20 +56,20 @@ class App extends React.Component {
 
   componentDidMount() {
     seafileAPI.login().then((response) => {
+
       seafileAPI.getFileDownloadLink(repoID, filePath).then((response) => {
         const url = response.data;
         fetch(url).then(function(response) {
           return response.text();
         }).then((body) => {
-          const state = State.create(markdown);
-          const document = state.deserializeToDocument(body);
-          const value = Value.create({document: document})
+          const value = deserialize(body);
           this.setState({
             value: value,
             isSelectedImage:false
           })
         })
       })
+
 
       seafileAPI.listDir(repoID, dirPath).then((response) => {
         var children = response.data.map((item) => {
@@ -135,10 +136,12 @@ class App extends React.Component {
 
   onSave = (event) => {
     const { value } = this.state;
+    /*
     const str = state.serializeDocument(value.document);
     seafileAPI.getUpdateLink(repoID, "/").then((response) => {
       updateFile(response.data, filePath, fileName, str)
     })
+    */
   }
 
   onTreeChange = (treeData) => {

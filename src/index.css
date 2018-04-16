@@ -97,7 +97,7 @@ input:focus {
 }
 
 .btn-active[data-active='true'] {
-  color: blue;
+  color: #eb8205;
 }
 
 /******* layout ***/
