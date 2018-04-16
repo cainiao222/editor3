@@ -6,9 +6,8 @@ import { SeafileEditor } from './lib/seafile-editor';
 import HTML5Backend from 'react-dnd-html5-backend';
 import { DragDropContext } from 'react-dnd';
 import './css/font.css'
-import './index.css';
 import './css/seafile-ui.css'
-
+import './index.css';
 
 import { serverConfig } from './config'
 import { SeafileAPI } from 'seafile-js';
