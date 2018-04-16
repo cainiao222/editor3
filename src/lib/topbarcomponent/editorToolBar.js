@@ -76,7 +76,7 @@ class Button extends React.Component{
 class Button extends React.Component{
   render() {
     return (
-      <button type={"button"} onMouseDown={this.props.onMouseDown} className={"btn btn-secondary"} data-active={this.props.isActive? this.props.isActive: false}>
+      <button type={"button"} onMouseDown={this.props.onMouseDown} className={"btn btn-secondary btn-active"} data-active={this.props.isActive? this.props.isActive: false}>
         {this.props.children? this.props.children : <i className={this.props.type}></i>}
 >>>>>>> reimplement layout
       </button>
