@@ -195,7 +195,7 @@ class App extends React.Component {
 
 }
 
-App = DragDropContext(HTML5Backend)(App)
+
 ReactDOM.render(
   <App />,
   document.getElementById('root')

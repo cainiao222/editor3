@@ -13,7 +13,9 @@ import { MarkButton, HeaderButton, BlockButton, CodeButton, ImageButton, SaveBut
 const DEFAULT_NODE = 'paragraph';
 const editCode = EditCode();
 const editTable = EditTable();
-const editList = EditList();
+const editList = EditList({
+  types: ["ordered_list", "unordered_list"]
+});
 /*
   When an image is pasted or dropped, insertImage() will be called.
   insertImage creates an image node with `file` stored in `data`.
@@ -77,6 +79,8 @@ function MyPlugin(options) {
         return true
       }
 
+
+
       // create a paragraph node after 'enter' after a header line
       if (
         startBlock.type !== 'header_one' &&
@@ -105,7 +109,6 @@ function MyPlugin(options) {
 }
 
 const plugins = [
-  editCode,
   editTable,
   editList,
   insertImages,
@@ -420,10 +423,8 @@ class SeafileEditor extends React.Component {
     const { attributes, children, node, isSelected } = props
     let textAlign;
     switch (node.type) {
-      case 'block-quote':
+      case 'blockquote':
         return <blockquote {...attributes}>{children}</blockquote>
-      case 'ul_list':
-        return <ul {...attributes}>{children}</ul>
       case 'header_one':
         return <h1 {...attributes}>{children}</h1>
       case 'header_two':
@@ -438,7 +439,9 @@ class SeafileEditor extends React.Component {
         return <h6 {...attributes}>{children}</h6>
       case 'list_item':
         return <li {...attributes}>{children}</li>
-      case 'ol_list':
+      case 'unordered_list':
+        return <ul {...attributes}>{children}</ul>
+      case 'ordered_list':
         return <ol {...attributes}>{children}</ol>
       case 'image':
         return <Image {...props}/>
@@ -446,12 +449,12 @@ class SeafileEditor extends React.Component {
         return <Image {...props} />
       case 'code_block':
         return (
-          <div className="code" {...attributes}>
+          <pre className="code" {...attributes}>
           {children}
-          </div>
+          </pre>
         );
       case 'code_line':
-        return <pre {...attributes}>{children}</pre>;
+        return <span>{children}</span>;
       case 'table':
         return (
           <table>
@@ -499,19 +502,6 @@ class SeafileEditor extends React.Component {
       }
       case 'punctuation': {
         return <span style={{ opacity: 0.2 }}>{children}</span>
-      }
-      case 'list': {
-        return (
-          <span
-          style={{
-            paddingLeft: '10px',
-            lineHeight: '10px',
-            fontSize: '20px',
-          }}
-          >
-          {children}
-          </span>
-        )
       }
       case 'hr': {
         return (
