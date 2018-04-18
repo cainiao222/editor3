@@ -63,6 +63,7 @@ class App extends React.Component {
           return response.text();
         }).then((body) => {
           const value = deserialize(body);
+          console.log(value);
           this.setState({
             value: value,
             isSelectedImage:false

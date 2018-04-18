@@ -255,6 +255,10 @@ input:focus {
   padding-left:2em;
   margin:0.5em 0;
 }
+.article li p:first-child {
+  margin-top: 0px;
+  margin-bottom: 0px;
+}
 .article code {
   font-size:12px;
   white-space: pre-wrap;

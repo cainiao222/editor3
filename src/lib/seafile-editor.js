@@ -423,6 +423,8 @@ class SeafileEditor extends React.Component {
     const { attributes, children, node, isSelected } = props
     let textAlign;
     switch (node.type) {
+      case 'paragraph':
+        return <p {...attributes}>{children}</p>
       case 'blockquote':
         return <blockquote {...attributes}>{children}</blockquote>
       case 'header_one':
