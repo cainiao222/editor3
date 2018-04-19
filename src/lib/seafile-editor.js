@@ -9,7 +9,7 @@ import FileTree from './file-tree';
 import { Image } from './image';
 import { Inline } from 'slate';
 import AddImageDialog from './add-image-dialog';
-import { MarkButton, HeaderButton, BlockButton, CodeButton, ImageButton, SaveButton, TableToolBar, Button, ButtonContainer } from "./topbarcomponent/editorToolBar";
+import { IconButton, TableToolBar, Button, ButtonGroup } from "./topbarcomponent/editorToolBar";
 const DEFAULT_NODE = 'paragraph';
 const editCode = EditCode();
 const editTable = EditTable();
@@ -558,16 +558,33 @@ class SeafileEditor extends React.Component {
     )
   }
 
-  renderToolbar = (isTableActive,isImageActive,isCodeActive) => {
+  renderToolbar = (isTableActive, isImageActive, isCodeActive) => {
     return (
       <div className="menu toolbar-menu">
-        <MarkButton renderMarkButton={this.renderMarkButton}/>
-        <HeaderButton isShow={{ isTableActive }}  renderBlockButton={this.renderBlockButton}/>
-        <BlockButton isShow={{ isTableActive }}  renderBlockButton={this.renderBlockButton}/>
-        <CodeButton  isShow={{ isTableActive }} isCodeActive={isCodeActive} onToggleCode={this.onToggleCode}/>
-        {isTableActive ? this.renderTableToolbar() : this.renderNormalTableBar()}
-        <ImageButton isImageActive={isImageActive}  onAddImage={this.onAddImage}/>
-        <SaveButton onSave={this.onSave}/>
+        <ButtonGroup>
+          {this.renderMarkButton("BOLD", "fa fa-bold")}
+          {this.renderMarkButton('ITALIC', 'fa fa-italic')}
+          {this.renderMarkButton('UNDERLINED', 'fa fa-underline')}
+        </ButtonGroup>
+        { isTableActive === false &&
+          <ButtonGroup>
+            {this.renderBlockButton('header_one', 'fa fa-h1')}
+            {this.renderBlockButton('header_two', 'fa fa-h2')}
+          </ButtonGroup>
+        }
+        { isTableActive === false &&
+          <div className={"btn-group"} role={"group"}>
+            {this.renderBlockButton('block-quote', 'fa fa-quote-left')}
+            {this.renderBlockButton('ordered_list', 'fa fa-list-ol')}
+            {this.renderBlockButton('unordered_list', 'fa fa-list-ul')}
+          </div>
+        }
+        { isTableActive === false &&
+          <IconButton icon="fa fa-code" onMouseDown={this.onToggleCode} isActive={isCodeActive}/>
+        }
+        {isTableActive ? this.renderTableToolbar() : this.renderAddTableButton()}
+        <IconButton icon="fa fa-image" onMouseDown={this.onAddImage} isActive={isImageActive}/>
+        <IconButton icon="fa fa-save" onMouseDown={this.onSave} />
         <AddImageDialog
           showAddImageDialog={this.state.showAddImageDialog}
           toggleImageDialog={this.toggleImageDialog}
@@ -577,12 +594,12 @@ class SeafileEditor extends React.Component {
     )
   }
 
-  renderNormalTableBar= () => {
+  renderAddTableButton = () => {
     const onAddTable = event => this.onAddTable(event);
     return(
-      <ButtonContainer>
-        <Button type={'fa fa-table'} onMouseDown={onAddTable}/>
-      </ButtonContainer>
+      <ButtonGroup>
+        <IconButton icon={'fa fa-table'} onMouseDown={onAddTable}/>
+      </ButtonGroup>
     )
   };
 
@@ -634,7 +651,7 @@ class SeafileEditor extends React.Component {
     const onMouseDown = event => this.onClickMark(event, type);
     return (
       // eslint-disable-next-line react/jsx-no-bind
-      <Button onMouseDown={onMouseDown} isActive={isActive} type={icon}></Button>
+      <IconButton onMouseDown={onMouseDown} isActive={isActive} icon={icon}></IconButton>
     )
   }
 
@@ -652,7 +669,7 @@ class SeafileEditor extends React.Component {
     const onMouseDown = event => this.onClickBlock(event, type);
     return (
       // eslint-disable-next-line react/jsx-no-bind
-      <Button onMouseDown={onMouseDown} isActive={isActive} type={icon}></Button>
+      <IconButton onMouseDown={onMouseDown} isActive={isActive} icon={icon}></IconButton>
     )
   }
 
