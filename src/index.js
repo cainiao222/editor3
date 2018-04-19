@@ -5,7 +5,8 @@ import ReactDOM from 'react-dom';
 import { SeafileEditor } from './lib/seafile-editor';
 import HTML5Backend from 'react-dnd-html5-backend';
 import { DragDropContext } from 'react-dnd';
-import './assets/css/fontawesome-all.css';
+import './assets/css/fa-solid.css';
+import './assets/css/fontawesome.css';
 import './css/seafile-ui.css'
 import './index.css';
 
