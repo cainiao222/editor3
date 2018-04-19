@@ -75,6 +75,10 @@ input:focus {
     border-color: blue;
 }
 
+a, a:hover {
+  color: #eb8205;
+}
+
 /**
  * Icons.
  */

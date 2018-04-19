@@ -428,8 +428,6 @@ class SeafileEditor extends React.Component {
         return <ol {...attributes}>{children}</ol>
       case 'image':
         return <Image {...props}/>
-      case 'image2':
-        return <Image {...props} />
       case 'code_block':
         return (
           <pre className="code" {...attributes}>
@@ -455,11 +453,17 @@ class SeafileEditor extends React.Component {
           {children}
           </td>
         );
+      case 'link':
+        var href = node.get('data').get('href');
+        console.log(node.get('data').get('href'));
+        return (
+          <a href={ href }>{children}</a>
+        );
     }
   }
 
   renderMark = props => {
-    const { children, mark } = props
+    const { children, mark, node } = props
     switch (mark.type) {
       case 'BOLD':
       return <strong>{children}</strong>
