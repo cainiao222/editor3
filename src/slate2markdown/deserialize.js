@@ -288,7 +288,6 @@ function _nodeToSlate(node, opts) {
 function deserialize(content) {
   var root = processor.runSync(processor.parse(content));
   var definition = definitions(root);
-
   var nodes = [];
   for (let child of root.children) {
     addChildNodeOrNodes(nodes, _nodeToSlate(child, { definition: definition }));

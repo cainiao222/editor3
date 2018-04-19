@@ -219,7 +219,7 @@ class SeafileEditor extends React.Component {
     change.setBlocks(type)
 
     if (type === 'list_item') {
-      change.wrapBlock('ul_list')
+      change.wrapBlock('unordered_list')
     }
 
     change.extendToStartOf(startBlock).delete()
@@ -286,37 +286,18 @@ class SeafileEditor extends React.Component {
     const change = value.change()
     const { document } = value
     // Handle everything but list buttons.
-    if (type !== 'ol_list' && type !== 'ul_list') {
+    if (type !== 'ordered_list' && type !== 'unordered_list') {
       const isActive = this.hasBlock(type);
-      const isList = this.hasBlock('list_item');
-      if (isList) {
-        change
-        .setBlocks(isActive ? DEFAULT_NODE : type)
-        .unwrapBlock('ul_list')
-        .unwrapBlock('ol_list')
-      } else {
-        change.setBlocks(isActive ? DEFAULT_NODE : type)
-      }
+      change.setBlocks(isActive ? DEFAULT_NODE : type)
     } else {
-      // Handle the extra wrapping required for list buttons.
-      const isList = this.hasBlock('list_item')
       const isType = value.blocks.some(block => {
         return !!document.getClosest(block.key, parent => parent.type === type)
       });
 
-      if (isList && isType) {
-        change
-        .setBlocks(DEFAULT_NODE)
-        .unwrapBlock('ol_list')
-        .unwrapBlock('ul_list')
-      } else if (isList) {
-        change
-        .unwrapBlock(
-          type === 'ul_list' ? 'ol_list' : 'ul_list'
-        )
-        .wrapBlock(type)
+      if (isType) {
+        editList.changes.unwrapList(change);
       } else {
-        change.setBlocks('list_item').wrapBlock(type)
+        editList.changes.wrapInList(editList.changes.unwrapList(change), type);
       }
     }
 
@@ -534,13 +515,14 @@ class SeafileEditor extends React.Component {
 
   render() {
     const  value  = this.props.value;
-    const isInTable = editTable.utils.isSelectionInTable(value);
-    const activeImage=this.hasSelectImage(value);
+    const isTableActive = editTable.utils.isSelectionInTable(value);
+    const isImageActive = this.hasSelectImage(value);
+    const isCodeActive = editCode.utils.isInCodeBlock(value);
     return (
       <div className='seafile-editor'>
         <div className="seafile-editor-topbar">
           <div className="title"><img src={ require('../assets/seafile-logo.png') } alt=""/></div>
-            { this.renderToolbar(isInTable,activeImage) }
+            {this.renderToolbar(isTableActive, isImageActive, isCodeActive)}
         </div>
         <div className="seafile-editor-main row">
             <div className="seafile-editor-left-panel col-3">
@@ -572,16 +554,15 @@ class SeafileEditor extends React.Component {
     )
   }
 
-  renderToolbar = (isInTable,activeImage) => {
-    const isCodeActive=editCode.utils.isInCodeBlock(this.props.value);
+  renderToolbar = (isTableActive,isImageActive,isCodeActive) => {
     return (
       <div className="menu toolbar-menu">
         <MarkButton renderMarkButton={this.renderMarkButton}/>
-        <HeaderButton renderBlockButton={this.renderBlockButton}/>
-        <BlockButton renderBlockButton={this.renderBlockButton} renderListButton={this.renderListButton}/>
-        <CodeButton isCodeActive={isCodeActive} onToggleCode={this.onToggleCode}/>
-        {isInTable?this.renderTableToolbar():this.renderNormalTableBar()}
-        <ImageButton isImageActive={activeImage}  onAddImage={this.onAddImage}/>
+        <HeaderButton isShow={{ isTableActive }}  renderBlockButton={this.renderBlockButton}/>
+        <BlockButton isShow={{ isTableActive }}  renderBlockButton={this.renderBlockButton}/>
+        <CodeButton  isShow={{ isTableActive }} isCodeActive={isCodeActive} onToggleCode={this.onToggleCode}/>
+        {isTableActive ? this.renderTableToolbar() : this.renderNormalTableBar()}
+        <ImageButton isImageActive={isImageActive}  onAddImage={this.onAddImage}/>
         <SaveButton onSave={this.onSave}/>
         <AddImageDialog
           showAddImageDialog={this.state.showAddImageDialog}
@@ -661,7 +642,9 @@ class SeafileEditor extends React.Component {
   * @return {Element}
   */
   renderBlockButton = (type, icon) => {
-    const isActive = this.hasBlock(type);
+    let isActive = this.hasBlock(type);
+    const Block = editList.utils.getCurrentList(this.props.value);
+    isActive = Block ? Block.type === type : isActive;
     const onMouseDown = event => this.onClickBlock(event, type);
     return (
       // eslint-disable-next-line react/jsx-no-bind

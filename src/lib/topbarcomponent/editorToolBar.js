@@ -41,7 +41,7 @@ class ButtonContainer extends React.Component {
   }
 }
 
-class Button extends React.Component{
+class Button extends React.Component {
   render() {
     return (
       <button type={"button"} onMouseDown={this.props.onMouseDown} className={"btn btn-secondary btn-active"} data-active={this.props.isActive? this.props.isActive: false}>
@@ -65,6 +65,9 @@ class MarkButton extends React.Component {
 
 class HeaderButton extends React.Component {
   render() {
+    if (this.props.isShow.isTableActive) {
+      return null
+    }
     return (
       <ButtonContainer>
         {this.props.renderBlockButton('header_one', 'looks_one')}
@@ -76,11 +79,14 @@ class HeaderButton extends React.Component {
 
 class BlockButton extends React.Component {
   render() {
+    if (this.props.isShow.isTableActive) {
+      return null
+    }
     return (
       <div className={"btn-group"} role={"group"}>
         {this.props.renderBlockButton('block-quote', 'format_quote')}
-        {this.props.renderBlockButton('ol_list', 'format_list_numbered')}
-        {this.props.renderBlockButton('ul_list', 'format_list_bulleted')}
+        {this.props.renderBlockButton('ordered_list', 'format_list_numbered')}
+        {this.props.renderBlockButton('unordered_list', 'format_list_bulleted')}
       </div>
     )
   }
@@ -88,6 +94,9 @@ class BlockButton extends React.Component {
 
 class CodeButton extends React.Component {
   render() {
+    if (this.props.isShow.isTableActive) {
+      return null
+    }
     return (
       <ButtonContainer>
         <Button type={'code'} onMouseDown={this.props.onToggleCode} isActive={this.props.isCodeActive}/>
@@ -110,7 +119,7 @@ class SaveButton extends React.Component {
   render() {
     return (
       <ButtonContainer>
-        <Button type={'save'} onMouseDown={this.props.onSave} isActive={this.props.isImageActive}/>
+        <Button type={'save'} onMouseDown={this.props.onSave} isActive={this.props.isActiveImage}/>
       </ButtonContainer>
     )
   }
