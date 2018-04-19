@@ -581,7 +581,7 @@ class SeafileEditor extends React.Component {
     const onAddTable = event => this.onAddTable(event);
     return(
       <ButtonContainer>
-        <Button type={'grid_on'} onMouseDown={onAddTable}/>
+        <Button type={'fa fa-table'} onMouseDown={onAddTable}/>
       </ButtonContainer>
     )
   };

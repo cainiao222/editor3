@@ -44,8 +44,10 @@ class ButtonContainer extends React.Component {
 class Button extends React.Component {
   render() {
     return (
-      <button type={"button"} onMouseDown={this.props.onMouseDown} className={"btn btn-secondary btn-active"} data-active={this.props.isActive? this.props.isActive: false}>
-        {this.props.children? this.props.children: <span className={"material-icons"}>{this.props.type}</span>}
+      <button type={"button"} onMouseDown={this.props.onMouseDown}
+        className={"btn btn-icon btn-secondary btn-active"} data-active={ this.props.isActive ? this.props.isActive : false }>
+        { this.props.children ? this.props.children :
+          <i className={this.props.type}></i> }
       </button>
     )
   }
@@ -55,9 +57,9 @@ class MarkButton extends React.Component {
   render() {
     return (
       <ButtonContainer>
-        {this.props.renderMarkButton('BOLD', 'format_bold')}
-        {this.props.renderMarkButton('ITALIC', 'format_italic')}
-        {this.props.renderMarkButton('UNDERLINED', 'format_underlined')}
+        {this.props.renderMarkButton('BOLD', 'fa fa-bold')}
+        {this.props.renderMarkButton('ITALIC', 'fa fa-italic')}
+        {this.props.renderMarkButton('UNDERLINED', 'fa fa-underline')}
       </ButtonContainer>
     )
   }
@@ -70,8 +72,8 @@ class HeaderButton extends React.Component {
     }
     return (
       <ButtonContainer>
-        {this.props.renderBlockButton('header_one', 'looks_one')}
-        {this.props.renderBlockButton('header_two', 'looks_two')}
+        {this.props.renderBlockButton('header_one', 'fa fa-h1')}
+        {this.props.renderBlockButton('header_two', 'fa fa-h2')}
       </ButtonContainer>
     )
   }
@@ -84,9 +86,9 @@ class BlockButton extends React.Component {
     }
     return (
       <div className={"btn-group"} role={"group"}>
-        {this.props.renderBlockButton('block-quote', 'format_quote')}
-        {this.props.renderBlockButton('ordered_list', 'format_list_numbered')}
-        {this.props.renderBlockButton('unordered_list', 'format_list_bulleted')}
+        {this.props.renderBlockButton('block-quote', 'fa fa-quote-left')}
+        {this.props.renderBlockButton('ordered_list', 'fa fa-list-ol')}
+        {this.props.renderBlockButton('unordered_list', 'fa fa-list-ul')}
       </div>
     )
   }
@@ -99,7 +101,7 @@ class CodeButton extends React.Component {
     }
     return (
       <ButtonContainer>
-        <Button type={'code'} onMouseDown={this.props.onToggleCode} isActive={this.props.isCodeActive}/>
+        <Button type={'fa fa-code'} onMouseDown={this.props.onToggleCode} isActive={this.props.isCodeActive}/>
       </ButtonContainer>
     )
   }
@@ -109,7 +111,7 @@ class ImageButton extends React.Component {
   render() {
     return (
       <ButtonContainer>
-        <Button type={'image'} onMouseDown={this.props.onAddImage} isActive={this.props.isImageActive}/>
+        <Button type={'fa fa-image'} onMouseDown={this.props.onAddImage} isActive={this.props.isImageActive}/>
       </ButtonContainer>
     )
   }
@@ -119,7 +121,7 @@ class SaveButton extends React.Component {
   render() {
     return (
       <ButtonContainer>
-        <Button type={'save'} onMouseDown={this.props.onSave} isActive={this.props.isActiveImage}/>
+        <Button type={'fa fa-save'} onMouseDown={this.props.onSave} isActive={this.props.isActiveImage}/>
       </ButtonContainer>
     )
   }
