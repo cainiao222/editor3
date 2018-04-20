@@ -18,7 +18,7 @@ class DropDownBox extends React.Component {
   render() {
     return (
       <Dropdown isOpen={this.state.dropdownOpen} toggle={this.toggle}>
-        <DropdownToggle>
+        <DropdownToggle caret>
           Set align
         </DropdownToggle>
         <DropdownMenu className={'drop-list'}>
@@ -45,7 +45,7 @@ class Button extends React.Component {
   render() {
     return (
       <button type={"button"} onMouseDown={this.props.onMouseDown}
-        className={"btn btn-secondary btn-active"} data-active={ this.props.isActive }>
+        className={"btn btn-secondary btn-active"}>
         { this.props.children }
       </button>
     )
@@ -56,7 +56,7 @@ class IconButton extends React.Component {
   render() {
     return (
       <button type={"button"} onMouseDown={this.props.onMouseDown}
-        className={"btn btn-icon btn-secondary btn-active"} data-active={ this.props.isActive ? this.props.isActive : false }>
+        className={"btn btn-icon btn-secondary btn-active"} data-active={ this.props.isActive || false }>
           <i className={this.props.icon}></i>
       </button>
     )
@@ -88,3 +88,4 @@ class TableToolBar extends React.Component {
 }
 
 export { IconButton, TableToolBar, Button, ButtonGroup }
+
