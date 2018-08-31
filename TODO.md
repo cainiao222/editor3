@@ -13,14 +13,6 @@ Release data: 2018.05.30
 * [x] renderNode() supports readering image node to <img>
 * [x] Add image icon, click image icon, popup a dialog to let user input an image
 
-## Version beta 2
-
-* [x] Improve table
-* [x] Improve CSS
-* [x] Copy/paste image from clipboard
-* [-] Improve code block
-* [-] Change toolbar button icons
-* [-] Support task list
 
 ### Tree view
 
