@@ -92,6 +92,10 @@ It correctly bundles React in production mode and optimizes the build for the be
 The build is minified and the filenames include the hashes.<br>
 Your app is ready to be deployed!
 
+1. wefwe
+2. 二二
+
+
 See the section about [deployment](#deployment) for more information.
 
 ### `npm run eject`
