@@ -109,6 +109,7 @@ function _nodeToSlate(node, opts) {
         nodes: children
       });
     case "list":
+      opts.loose = node.loose;
       children = parseChildren(node, opts);
       if (node.ordered) {
         return Block.create({
@@ -126,17 +127,6 @@ function _nodeToSlate(node, opts) {
       var data = {}
       if (node.checked !== null) {
         data.checked = node.checked;
-      }
-      if (node.loose === false && children[0]) {
-        // need to change the first child from paragrash to unstyled
-        var firstChild = children[0];
-        if (firstChild.type === "paragraph") {
-          var newChild = new Block.create({
-            type: "unstyled",
-            nodes: firstChild.nodes
-          })
-          children[0] = newChild;
-        }
       }
       return Block.create({
         type: 'list_item',
@@ -298,7 +288,6 @@ function _nodeToSlate(node, opts) {
 function deserialize(content) {
   var root = processor.runSync(processor.parse(content));
   var definition = definitions(root);
-
   var nodes = [];
   for (let child of root.children) {
     addChildNodeOrNodes(nodes, _nodeToSlate(child, { definition: definition }));

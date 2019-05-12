@@ -179,21 +179,19 @@ function _slateNodeToMD(node) {
       case "list_item":
         mdNodes = parseChildren(node);
         var loose = false;
-        if (mdNodes && mdNodes[0].noNewLine === undefined) {
-          loose = true;
+        if (mdNodes) {
+          if (mdNodes.length == 1) {
+            loose = false;
+          } else if (mdNodes.length == 2 && mdNodes[1].type == "list") {
+            loose = false;
+          } else {
+            loose = true;
+          }
         }
         return {
           type: "listItem",
           loose: loose,
           checked: node.data.checked !== undefined ? node.data.checked : null,
-          children: mdNodes
-        }
-      case "unstyled":
-        // used for list item without "\n" after the first line
-        mdNodes = parseChildren(node);
-        return {
-          type: "paragraph",
-          noNewLine: true,
           children: mdNodes
         }
       case "code_block":

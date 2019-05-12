@@ -75,6 +75,10 @@ input:focus {
     border-color: blue;
 }
 
+a, a:hover {
+  color: #eb8205;
+}
+
 /**
  * Icons.
  */
@@ -253,6 +257,10 @@ input:focus {
 .article ol {
   padding-left:2em;
   margin:0.5em 0;
+}
+.article li p:first-child {
+  margin-top: 0px;
+  margin-bottom: 0px;
 }
 .article code {
   font-size:12px;

@@ -5,7 +5,8 @@ import ReactDOM from 'react-dom';
 import { SeafileEditor } from './lib/seafile-editor';
 import HTML5Backend from 'react-dnd-html5-backend';
 import { DragDropContext } from 'react-dnd';
-import './css/font.css'
+import './assets/css/fa-solid.css';
+import './assets/css/fontawesome.css';
 import './css/seafile-ui.css'
 import './index.css';
 
@@ -63,6 +64,7 @@ class App extends React.Component {
           return response.text();
         }).then((body) => {
           const value = deserialize(body);
+          console.log(value);
           this.setState({
             value: value,
             isSelectedImage:false
@@ -195,7 +197,7 @@ class App extends React.Component {
 
 }
 
-App = DragDropContext(HTML5Backend)(App)
+
 ReactDOM.render(
   <App />,
   document.getElementById('root')

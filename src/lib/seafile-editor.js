@@ -9,11 +9,13 @@ import FileTree from './file-tree';
 import { Image } from './image';
 import { Inline } from 'slate';
 import AddImageDialog from './add-image-dialog';
-import { MarkButton, HeaderButton, BlockButton, CodeButton, ImageButton, SaveButton, TableToolBar, Button } from "./topbarcomponent/editorToolBar";
+import { IconButton, TableToolBar, Button, ButtonGroup } from "./topbarcomponent/editorToolBar";
 const DEFAULT_NODE = 'paragraph';
 const editCode = EditCode();
 const editTable = EditTable();
-const editList = EditList();
+const editList = EditList({
+  types: ["ordered_list", "unordered_list"]
+});
 /*
   When an image is pasted or dropped, insertImage() will be called.
   insertImage creates an image node with `file` stored in `data`.
@@ -77,6 +79,8 @@ function MyPlugin(options) {
         return true
       }
 
+
+
       // create a paragraph node after 'enter' after a header line
       if (
         startBlock.type !== 'header_one' &&
@@ -105,7 +109,6 @@ function MyPlugin(options) {
 }
 
 const plugins = [
-  editCode,
   editTable,
   editList,
   insertImages,
@@ -216,7 +219,7 @@ class SeafileEditor extends React.Component {
     change.setBlocks(type)
 
     if (type === 'list_item') {
-      change.wrapBlock('ul_list')
+      change.wrapBlock('unordered_list')
     }
 
     change.extendToStartOf(startBlock).delete()
@@ -283,37 +286,18 @@ class SeafileEditor extends React.Component {
     const change = value.change()
     const { document } = value
     // Handle everything but list buttons.
-    if (type !== 'ol_list' && type !== 'ul_list') {
+    if (type !== 'ordered_list' && type !== 'unordered_list') {
       const isActive = this.hasBlock(type);
-      const isList = this.hasBlock('list_item');
-      if (isList) {
-        change
-        .setBlocks(isActive ? DEFAULT_NODE : type)
-        .unwrapBlock('ul_list')
-        .unwrapBlock('ol_list')
-      } else {
-        change.setBlocks(isActive ? DEFAULT_NODE : type)
-      }
+      change.setBlocks(isActive ? DEFAULT_NODE : type)
     } else {
-      // Handle the extra wrapping required for list buttons.
-      const isList = this.hasBlock('list_item')
       const isType = value.blocks.some(block => {
         return !!document.getClosest(block.key, parent => parent.type === type)
       });
 
-      if (isList && isType) {
-        change
-        .setBlocks(DEFAULT_NODE)
-        .unwrapBlock('ol_list')
-        .unwrapBlock('ul_list')
-      } else if (isList) {
-        change
-        .unwrapBlock(
-          type === 'ul_list' ? 'ol_list' : 'ul_list'
-        )
-        .wrapBlock(type)
+      if (isType) {
+        editList.changes.unwrapList(change);
       } else {
-        change.setBlocks('list_item').wrapBlock(type)
+        editList.changes.wrapInList(editList.changes.unwrapList(change), type);
       }
     }
 
@@ -420,10 +404,10 @@ class SeafileEditor extends React.Component {
     const { attributes, children, node, isSelected } = props
     let textAlign;
     switch (node.type) {
-      case 'block-quote':
+      case 'paragraph':
+        return <p {...attributes}>{children}</p>
+      case 'blockquote':
         return <blockquote {...attributes}>{children}</blockquote>
-      case 'ul_list':
-        return <ul {...attributes}>{children}</ul>
       case 'header_one':
         return <h1 {...attributes}>{children}</h1>
       case 'header_two':
@@ -438,20 +422,20 @@ class SeafileEditor extends React.Component {
         return <h6 {...attributes}>{children}</h6>
       case 'list_item':
         return <li {...attributes}>{children}</li>
-      case 'ol_list':
+      case 'unordered_list':
+        return <ul {...attributes}>{children}</ul>
+      case 'ordered_list':
         return <ol {...attributes}>{children}</ol>
       case 'image':
         return <Image {...props}/>
-      case 'image2':
-        return <Image {...props} />
       case 'code_block':
         return (
-          <div className="code" {...attributes}>
+          <pre className="code" {...attributes}>
           {children}
-          </div>
+          </pre>
         );
       case 'code_line':
-        return <pre {...attributes}>{children}</pre>;
+        return <span>{children}</span>;
       case 'table':
         return (
           <table>
@@ -469,11 +453,17 @@ class SeafileEditor extends React.Component {
           {children}
           </td>
         );
+      case 'link':
+        var href = node.get('data').get('href');
+        console.log(node.get('data').get('href'));
+        return (
+          <a href={ href }>{children}</a>
+        );
     }
   }
 
   renderMark = props => {
-    const { children, mark } = props
+    const { children, mark, node } = props
     switch (mark.type) {
       case 'BOLD':
       return <strong>{children}</strong>
@@ -499,19 +489,6 @@ class SeafileEditor extends React.Component {
       }
       case 'punctuation': {
         return <span style={{ opacity: 0.2 }}>{children}</span>
-      }
-      case 'list': {
-        return (
-          <span
-          style={{
-            paddingLeft: '10px',
-            lineHeight: '10px',
-            fontSize: '20px',
-          }}
-          >
-          {children}
-          </span>
-        )
       }
       case 'hr': {
         return (
@@ -542,13 +519,14 @@ class SeafileEditor extends React.Component {
 
   render() {
     const  value  = this.props.value;
-    const isInTable = editTable.utils.isSelectionInTable(value);
-    const activeImage=this.hasSelectImage(value);
+    const isTableActive = editTable.utils.isSelectionInTable(value);
+    const isImageActive = this.hasSelectImage(value);
+    const isCodeActive = editCode.utils.isInCodeBlock(value);
     return (
       <div className='seafile-editor'>
         <div className="seafile-editor-topbar">
           <div className="title"><img src={ require('../assets/seafile-logo.png') } alt=""/></div>
-            { this.renderToolbar(isInTable,activeImage) }
+            {this.renderToolbar(isTableActive, isImageActive, isCodeActive)}
         </div>
         <div className="seafile-editor-main row">
             <div className="seafile-editor-left-panel col-3">
@@ -580,17 +558,33 @@ class SeafileEditor extends React.Component {
     )
   }
 
-  renderToolbar = (isInTable,activeImage) => {
-    const isCodeActive=editCode.utils.isInCodeBlock(this.props.value);
+  renderToolbar = (isTableActive, isImageActive, isCodeActive) => {
     return (
       <div className="menu toolbar-menu">
-        <MarkButton renderMarkButton={this.renderMarkButton}/>
-        <HeaderButton renderBlockButton={this.renderBlockButton}/>
-        <BlockButton renderBlockButton={this.renderBlockButton} renderListButton={this.renderListButton}/>
-        <CodeButton isCodeActive={isCodeActive} onToggleCode={this.onToggleCode}/>
-        {isInTable?this.renderTableToolbar():this.renderNormalTableBar()}
-        <ImageButton isImageActive={activeImage}  onAddImage={this.onAddImage}/>
-        <SaveButton onSave={this.onSave}/>
+        <ButtonGroup>
+          {this.renderMarkButton("BOLD", "fa fa-bold")}
+          {this.renderMarkButton('ITALIC', 'fa fa-italic')}
+          {this.renderMarkButton('UNDERLINED', 'fa fa-underline')}
+        </ButtonGroup>
+        { isTableActive === false &&
+          <ButtonGroup>
+            {this.renderBlockButton('header_one', 'fa fa-h1')}
+            {this.renderBlockButton('header_two', 'fa fa-h2')}
+          </ButtonGroup>
+        }
+        { isTableActive === false &&
+          <div className={"btn-group"} role={"group"}>
+            {this.renderBlockButton('block-quote', 'fa fa-quote-left')}
+            {this.renderBlockButton('ordered_list', 'fa fa-list-ol')}
+            {this.renderBlockButton('unordered_list', 'fa fa-list-ul')}
+          </div>
+        }
+        { isTableActive === false &&
+          <IconButton icon="fa fa-code" onMouseDown={this.onToggleCode} isActive={isCodeActive}/>
+        }
+        {isTableActive ? this.renderTableToolbar() : this.renderAddTableButton()}
+        <IconButton icon="fa fa-image" onMouseDown={this.onAddImage} isActive={isImageActive}/>
+        <IconButton icon="fa fa-save" onMouseDown={this.onSave} />
         <AddImageDialog
           showAddImageDialog={this.state.showAddImageDialog}
           toggleImageDialog={this.toggleImageDialog}
@@ -600,12 +594,12 @@ class SeafileEditor extends React.Component {
     )
   }
 
-  renderNormalTableBar= () => {
+  renderAddTableButton = () => {
     const onAddTable = event => this.onAddTable(event);
     return(
-      <ButtonContainer>
-        <Button type={'grid_on'} onMouseDown={onAddTable}/>
-      </ButtonContainer>
+      <ButtonGroup>
+        <IconButton icon={'fa fa-table'} onMouseDown={onAddTable}/>
+      </ButtonGroup>
     )
   };
 
@@ -657,7 +651,7 @@ class SeafileEditor extends React.Component {
     const onMouseDown = event => this.onClickMark(event, type);
     return (
       // eslint-disable-next-line react/jsx-no-bind
-      <Button onMouseDown={onMouseDown} isActive={isActive} type={icon}></Button>
+      <IconButton onMouseDown={onMouseDown} isActive={isActive} icon={icon}></IconButton>
     )
   }
 
@@ -669,11 +663,13 @@ class SeafileEditor extends React.Component {
   * @return {Element}
   */
   renderBlockButton = (type, icon) => {
-    const isActive = this.hasBlock(type);
+    let isActive = this.hasBlock(type);
+    const Block = editList.utils.getCurrentList(this.props.value);
+    isActive = Block ? Block.type === type : isActive;
     const onMouseDown = event => this.onClickBlock(event, type);
     return (
       // eslint-disable-next-line react/jsx-no-bind
-      <Button onMouseDown={onMouseDown} isActive={isActive} type={icon}></Button>
+      <IconButton onMouseDown={onMouseDown} isActive={isActive} icon={icon}></IconButton>
     )
   }
 
